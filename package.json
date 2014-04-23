@@ -1,0 +1,10 @@
+{
+  "name": "BackupPass",
+  "description": "A simple backup server for KeePass users",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "4.0.0",
+    "body-parser": "~1.0.2"
+  }
+}
