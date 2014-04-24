@@ -1,6 +1,7 @@
 hash.crypt
 sslcert
 setup
+keepass
 
 lib-cov
 *.seed
