@@ -61,6 +61,14 @@ var list_accts = function(key, keyfile, next) {
  *
  */
 
+app.all('*', function(req, res) {
+  if (req.headers['x-forwarded-proto']!='https')
+{
+  res.send("Error: 404");
+}
+
+});
+
 app.get('/', function (req, res) {
   if (req.headers['x-forwarded-proto']=='https')
     res.sendfile('./public/index.html');
