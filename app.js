@@ -1,6 +1,4 @@
 var fs = require('fs');
-var http = require('http');
-var https = require('https');
 var bodyParser = require('body-parser');
 var tmp = require('tmp');
 
@@ -118,8 +116,6 @@ app.post('/auth', function(req, res) {
  */
 
 
-var httpServer = http.createServer(app);
-var httpsServer = https.createServer(credentials, app);
 
 console.log('Server started');
 
@@ -129,13 +125,17 @@ console.log('Server started');
 
 if (process.env.NODE_ENV == 'production')
 {
-  httpServer.listen(process.env.PORT);
+  app.listen(process.env.PORT);
 }
 else
 {
+  var http = require('http');
+  var https = require('https');
   // Define SSL stuff
   var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
   var certificate = fs.readFileSync('sslcert/public-cert.pem');
   var credentials = {key: privateKey, cert: certificate};
+  var httpServer = http.createServer(app);
+  var httpsServer = https.createServer(credentials, app);
   httpsServer.listen(443);
 }
