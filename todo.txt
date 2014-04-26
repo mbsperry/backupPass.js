@@ -1,0 +1,20 @@
+Things to do
+[X] HTTPS
+[X] Authenticate
+[ ] One-time passwords
+[ ] 5 second time out between attempts
+[ ] Shutdown server after 5 fails
+[ ] Delete kdbx, all encrypted keyfiles after 5 fails
+[ ] Decrypt key file and save to temporary file
+[-] Display image that was encrypted with pswd and md5 hash
+[ ] Display verifcation image or phrase
+[X] See node-tmp
+[X] Get kdbx password
+[ ] Same things -- after 5 tries delete everything
+[X] Load kdbx
+[X] Show list of Accounts
+[X] Show password for selected account
+[ ] Close connection
+[ ] Delete encrypted keyfile
+[ ] Purge kdbx from memory
+[ ] Write README

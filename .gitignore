@@ -1,9 +1,7 @@
-hash.crypt
-key.crypt
 test.js
 sslcert
 setup
-keepass
+keepass/key.key
 
 
 lib-cov

@@ -129,5 +129,8 @@ console.log('Server started');
 
 // Uncomment below if you want server to respond to non-https requests
 // [ ] TODO: Forward non-https to https
-//httpServer.listen(80);
-httpsServer.listen(8443);
+// httpServer.listen(5000);
+if (process.env.NODE_ENV == 'production')
+httpServer.listen(process.env.PORT);
+else
+httpsServer.listen(443);
