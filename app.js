@@ -123,12 +123,7 @@ console.log('Server started');
 // [ ] TODO: Forward non-https to https
 // httpServer.listen(5000);
 
-if (process.env.NODE_ENV == 'production')
-{
-  app.listen(process.env.PORT);
-}
-else
-{
+  app.listen(process.env.PORT || 5000);
   //var http = require('http');
   //var https = require('https');
   //// Define SSL stuff
@@ -138,4 +133,3 @@ else
   //var httpServer = http.createServer(app);
   //var httpsServer = https.createServer(credentials, app);
   //httpsServer.listen(443);
-}
