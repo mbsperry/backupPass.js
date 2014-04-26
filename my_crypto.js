@@ -31,9 +31,14 @@ var encrypt = function (text, key) {
 
 var decrypt = function (text, key) {
   var decipher = crypto.createDecipher('aes-256-cbc',key);
-  var dec = decipher.update(text,'hex','utf8');
-  dec += decipher.final('utf8');
-  return dec;
+  try {
+    var dec = decipher.update(text,'hex','utf8');
+    dec += decipher.final('utf8');
+    return dec;
+  } catch (ex) {
+    console.log(ex);
+    return false;
+  }
 };
 
 var write_encrypted_phrase = function (phrase, hash, filename) {

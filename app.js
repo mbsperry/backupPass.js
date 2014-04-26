@@ -30,6 +30,7 @@ app.use(bodyParser()); // support for URL-encoded bodies in posts
  */
 
 var passwords = [];
+var clear_key = "";
 
 var write_tmp_file = function (data, next) {
   tmp.file(function _tempFileCreated(err, path, fd) {
@@ -75,21 +76,13 @@ app.post('/show', function(req, res) {
   res.send(html);
 });
 
-app.post('/', function(req, res) {
-  var key = req.body.key;
+app.post('/list', function(req, res) {
 
   var render = function(html) {
     res.send(html);
   };
-
-  clear_key = my_crypto.decrypt_phrase(key, './key.crypt');
-  console.log(clear_key);
-
   // List of functions to be executed sequentially
-  s = [
-    function(next) { write_tmp_file(clear_key, next); },
-    function(result, next) { list_accts('a test', result, next); } 
-  ];
+  s = [function(next) { write_tmp_file(clear_key, next); }, function(result, next) { list_accts('a test', result, next); } ];
 
   // This is a little tricky:
   // Takes an array of functions, passes the result from the preceding 
@@ -97,6 +90,21 @@ app.post('/', function(req, res) {
   // The second argument is the last function to execute, gets the cumulative
   // result of the preceding operations.
   series.series_on_result(s, render);
+
+});
+
+app.post('/auth', function(req, res) {
+  var key = req.body.key;
+  console.log("Supplied auth: " + key);
+
+  clear_key = my_crypto.decrypt_phrase(key, './key.crypt');
+  console.log(clear_key);
+  if (clear_key) {
+    res.send("true");
+  }
+  else {
+    res.send("false");
+  }
  
 });
 

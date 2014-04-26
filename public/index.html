@@ -10,7 +10,16 @@
 
         $("#key_button").click(function () {
           $(".key_form").hide("fast", function() {
-            $("#pass_form").show("fast");
+            var parameters = { key: $("#key").val() };
+            $.post('/auth', parameters, function(data) {
+              if (data == "true") {
+                $("#pass_form").show("fast");
+              }
+              else { 
+                $(".accounts").show("fast");
+                $(".accounts").html("Incorrect authorization");
+              }
+            });
           });
         });
 
@@ -44,12 +53,12 @@
       <h3>BackupPass</h3>
       <div id="input">
         <form name="key_form" class="key_form">
-          <b>Authenticate:</b> <input type="text" name="key" class="key">
+          <b>Authenticate:</b> <input type="text" name="key" id="key">
           <input type="button" value="Enter" class="button" id="key_button">
         </form>
 
         <form name="pass_form" id="pass_form">
-          <b>Password:</b> <input type="text" name="key" class="key">
+          <b>Password:</b> <input type="text" name="key" id="pass">
           <input type="button" value="Enter" class="button" id="pass_button">
         </form>
 
