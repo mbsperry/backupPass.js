@@ -21,7 +21,10 @@
         });
         $(".accounts").on('click', '#acct', function() {
           var index = $("li").index(this);
-          alert(index);
+          var parameters = { index: index };
+          $.post('/show', parameters, function(data) {
+            $(".accounts").html(data);
+          });
         });
       });
     </script>

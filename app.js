@@ -29,6 +29,8 @@ app.use(bodyParser()); // support for URL-encoded bodies in posts
  *
  */
 
+var passwords = [];
+
 var write_tmp_file = function (data, next) {
   tmp.file(function _tempFileCreated(err, path, fd) {
     if (err) throw err;
@@ -42,12 +44,13 @@ var write_tmp_file = function (data, next) {
 };
 
 var list_accts = function(key, keyfile, next) {
-  kp.get_accts('./keepass/test.kdbx', key, keyfile, function(accts) {
-    html = '<ul class="accounts">';
+  kp.get_accts('./keepass/test.kdbx', key, keyfile, function(accts, pass) {
+    html = '<ul> ';
     accts.forEach(function(entry) {
       html += "<li id='acct'>" + entry + "</li>";
     });
     html += "</ul>";
+    passwords = pass;
     next(html);
   });
 };
@@ -64,6 +67,12 @@ app.get('/', function (req, res) {
 
 app.get('/style.css', function(req, res) {
   res.sendfile('./public/style.css');
+});
+
+app.post('/show', function(req, res) {
+  var index= req.body.index;
+  html = "<span>Password: " + passwords[index] +"</span>";
+  res.send(html);
 });
 
 app.post('/', function(req, res) {

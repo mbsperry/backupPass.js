@@ -2,6 +2,7 @@ var keepassio = require('keepass.io');
 
 function get_accts(key_db, passwd, keyfile, next) {
   accts = [];
+  pass = [];
   db = new keepassio();
 
   db.setCredentials( {
@@ -16,20 +17,19 @@ function get_accts(key_db, passwd, keyfile, next) {
     
     // Get each group entry 
     for (var prop in groups) {
-     console.log(groups[prop].entries);
 
      // each entry has a title, username, password
       for (var entry in groups[prop].entries) {
-        accounts = groups[prop];
-        console.log(groups[prop].entries[entry].title);
-        title = groups[prop].entries[entry].title;
+        var title = groups[prop].entries[entry].title;
+        var passwd = groups[prop].entries[entry].password;
         accts.push(title);
+        pass.push(passwd);
       }
 
     }
 
     // Execute callback
-    return next(accts);
+    return next(accts, pass);
   });
 
 }
