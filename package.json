@@ -2,12 +2,26 @@
   "name": "BackupPass",
   "description": "A simple backup server for KeePass users",
   "version": "0.0.1",
+  "author": "Matthew Sperry",
+  "license": "MIT",
+  "main": "app.js",
   "private": true,
+
+  "scripts": {
+      "start": "node index.js"
+  },
+
   "dependencies": {
     "express": "4.0.0",
     "body-parser": "~1.0.2",
     "tmp": "~0.0.23",
     "keepass.io": "~0.2.8"
 
+  }
+}
+
+{
+  "engines": {
+    "node": "0.10.x"
   }
 }

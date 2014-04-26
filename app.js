@@ -61,22 +61,12 @@ var list_accts = function(key, keyfile, next) {
  *
  */
 
-app.all('*', function(req, res) {
-  if (req.headers['x-forwarded-proto']!='https')
-{
-  res.send("Error: 404");
-}
-
-});
-
 app.get('/', function (req, res) {
-  if (req.headers['x-forwarded-proto']=='https')
-    res.sendfile('./public/index.html');
+  res.sendfile('./public/index.html');
 });
 
 app.get('/style.css', function(req, res) {
-  if (req.headers['x-forwarded-proto']=='https')
-    res.sendfile('./public/style.css');
+  res.sendfile('./public/style.css');
 });
 
 app.post('/show', function(req, res) {
@@ -125,21 +115,18 @@ app.post('/auth', function(req, res) {
  *
  */
 
-
-
-console.log('Server started');
-
-// Uncomment below if you want server to respond to non-https requests
-// [ ] TODO: Forward non-https to https
-// httpServer.listen(5000);
-
+if (process.env.NODE_ENV == "production")
+{
   app.listen(process.env.PORT || 5000);
-  //var http = require('http');
-  //var https = require('https');
-  //// Define SSL stuff
-  //var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
-  //var certificate = fs.readFileSync('sslcert/public-cert.pem');
-  //var credentials = {key: privateKey, cert: certificate};
-  //var httpServer = http.createServer(app);
-  //var httpsServer = https.createServer(credentials, app);
-  //httpsServer.listen(443);
+  console.log("Server started");
+}
+else
+{
+  var https = require('https');
+  var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
+  var certificate = fs.readFileSync('sslcert/public-cert.pem');
+  var credentials = {key: privateKey, cert: certificate};
+  var httpsServer = https.createServer(credentials, app);
+  httpsServer.listen(8443);
+  console.log("Server started");
+}
