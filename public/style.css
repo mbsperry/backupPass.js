@@ -7,6 +7,10 @@ body {
   margin: 200px;
 }
 
+h3 {
+  color: grey;
+}
+
 .accounts {
   display: none;
 }
@@ -39,7 +43,7 @@ body {
 }
 
 .button {
-  color: white; 
+  color: grey; 
   text-decoration: none; 
   font-size: .875em; 
   font-family: helvetica, arial; 
