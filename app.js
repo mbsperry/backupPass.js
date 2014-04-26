@@ -62,11 +62,13 @@ var list_accts = function(key, keyfile, next) {
  */
 
 app.get('/', function (req, res) {
-  res.sendfile('./public/index.html');
+  if (req.headers['x-forwarded-proto']=='https')
+    res.sendfile('./public/index.html');
 });
 
 app.get('/style.css', function(req, res) {
-  res.sendfile('./public/style.css');
+  if (req.headers['x-forwarded-proto']=='https')
+    res.sendfile('./public/style.css');
 });
 
 app.post('/show', function(req, res) {
