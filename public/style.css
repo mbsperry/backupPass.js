@@ -1,0 +1,50 @@
+body {
+    font-size: 100%;
+    background-color: #282828;
+}
+
+#app {
+    margin: 200px;
+}
+
+.accounts {
+    display: none;
+}
+
+#input {
+    border:2px solid;
+    border-radius:5px;
+    background-color: grey;
+    padding: 20px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    text-align: center;
+    font-family: Verdana, Helvetica, Sans-serif;
+}
+
+#copyleft {
+    font-family: Verdana, sans-serif;
+    font-size: 0.5em;
+    color: grey;
+    padding-top: 5px;
+    float: right;
+}
+
+.button {
+    color: white; 
+     text-decoration: none; 
+     font-size: .875em; 
+     font-family: helvetica, arial; 
+     font-weight: bold; 
+     position: relative; 
+    
+    background: #282828; 
+
+    
+    -moz-border-radius: 1px; 
+     -webkit-border-radius: 1px; 
+     border-radius: 2px; 
+  
+     border: 0px solid #368DBE; 
+     border-top: 1px solid #c3d6df; 
+}

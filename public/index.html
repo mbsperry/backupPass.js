@@ -1,13 +1,46 @@
 <html>
   <head>
     <title>BackupPass</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+    <script>
+      $(document).ready(function() {
+        $(".button").click(function () {
+          $(".key_form").hide("fast", function() {
+            $("#input").css("padding-top", "10px");
+            $("#input").css("padding-bottom", "10px");
+            $("#input").css("text-align", "left");
+            $(".accounts").show("fast");
+            var parameters = { key: $(".key").val() };
+            $.post('/', parameters, function(data) {
+              $(".accounts").html(data);
+            });
+          });
+        });
+        $(".accounts").on('click', '#acct', function() {
+          var index = $("li").index(this);
+          alert(index);
+        });
+      });
+    </script>
   </head>
 
   <body>
-    <form action="/" method="post">
-      Authenticate: <input type="text" name="key">
-      <button type="submit">Submit</button>
-    </form>
-    <br>
+    <div id="app">
+      <h3>BackupPass</h3>
+      <div id="input">
+        <form name="key_form" class="key_form">
+          <b>Authenticate:</b> <input type="text" name="key" class="key">
+          <input type="button" value="Enter" class="button">
+        </form>
+        <p class="accounts">Loading...</p>
+      </div>
+
+      <div id="copyleft">
+        BackupPass version 0.0.1. Open source, MIT license. 2014.
+      </div>
+    </div>
   </body>
 </html>

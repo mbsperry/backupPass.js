@@ -1,3 +1,6 @@
+// Not currently using hash of app file, I decided this didn't add much
+// to security. Can reconsider later
+
 var crypto = require('crypto');
 var fs = require('fs');
 
@@ -33,21 +36,25 @@ var decrypt = function (text, key) {
   return dec;
 };
 
-var write_encrypted_phrase = function (phrase, hash) {
+var write_encrypted_phrase = function (phrase, hash, filename) {
   var c = encrypt(phrase, hash);
-  fs.writeFileSync('hash.crypt', c, 'hex', function (err) {
+  fs.writeFileSync(filename, c, 'hex', function (err) {
     if (err) throw err;
     console.log('Saved File');
   });
 };
 
-var decrypt_phrase = function (key, next) {
-  var crypt = fs.readFileSync('hash.crypt', 'hex');
-  make_hash(key, function(hash) {
-    var phrase = decrypt(crypt, hash);
-    console.log(phrase);
-    next(phrase);
-  });
+var decrypt_phrase = function (key, file, next) {
+  console.log("Decrypting: " + file);
+  var crypt = fs.readFileSync(file, 'hex');
+  var phrase = decrypt(crypt, key);
+  console.log("Clear phrase: " + phrase);
+  return phrase;
+  //make_hash(key, function(hash) {
+    //var phrase = decrypt(crypt, hash);
+    //console.log(phrase);
+    //next(phrase);
+  //});
 };
 
 

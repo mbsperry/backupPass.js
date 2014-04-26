@@ -1,7 +1,10 @@
 hash.crypt
+key.crypt
+test.js
 sslcert
 setup
 keepass
+
 
 lib-cov
 *.seed
