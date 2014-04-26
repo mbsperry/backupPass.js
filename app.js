@@ -45,14 +45,19 @@ var write_tmp_file = function (data, next) {
 };
 
 var list_accts = function(key, keyfile, next) {
-  kp.get_accts('./keepass/test.kdbx', key, keyfile, function(accts, pass) {
-    html = '<ul> ';
-    accts.forEach(function(entry) {
-      html += "<li id='acct'>" + entry + "</li>";
-    });
-    html += "</ul>";
-    passwords = pass;
-    next(html);
+  kp.get_accts('./keepass/test.kdbx', key, keyfile, function(error, accts, pass) {
+    if (error) {
+      html="Incorrect Password";
+    }
+    else {
+      html = '<ul> ';
+      accts.forEach(function(entry) {
+        html += "<li id='acct'>" + entry + "</li>";
+      });
+      html += "</ul>";
+      passwords = pass;
+    }
+  next(html);
   });
 };
 
@@ -109,16 +114,6 @@ app.post('/auth', function(req, res) {
  
 });
 
-// ***** Deprecated function for testing only ********
-app.get('/accts', function(req, res) {
-  kp.get_accts('./keepass/test.kdbx', 'a test', './keepass/key.key', function(accts) {
-    html = "";
-    accts.forEach(function(entry) {
-      html += entry + "<br>";
-    });
-    res.send(html);
-  });
-});
 
 /*
  *

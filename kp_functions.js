@@ -10,7 +10,9 @@ function get_accts(key_db, passwd, keyfile, next) {
     keyfile: keyfile });
 
   db.load(key_db, function(error, data) {
-    if(error) throw error;
+    if(error) {
+      return next(error);
+    }
     
     // First, select only the "groups" from JSON structure
     var groups = data.groups;
@@ -29,7 +31,7 @@ function get_accts(key_db, passwd, keyfile, next) {
     }
 
     // Execute callback
-    return next(accts, pass);
+    return next(error, accts, pass);
   });
 
 }
