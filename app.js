@@ -129,13 +129,13 @@ if (process.env.NODE_ENV == 'production')
 }
 else
 {
-  var http = require('http');
-  var https = require('https');
-  // Define SSL stuff
-  var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
-  var certificate = fs.readFileSync('sslcert/public-cert.pem');
-  var credentials = {key: privateKey, cert: certificate};
-  var httpServer = http.createServer(app);
-  var httpsServer = https.createServer(credentials, app);
-  httpsServer.listen(443);
+  //var http = require('http');
+  //var https = require('https');
+  //// Define SSL stuff
+  //var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
+  //var certificate = fs.readFileSync('sslcert/public-cert.pem');
+  //var credentials = {key: privateKey, cert: certificate};
+  //var httpServer = http.createServer(app);
+  //var httpsServer = https.createServer(credentials, app);
+  //httpsServer.listen(443);
 }
