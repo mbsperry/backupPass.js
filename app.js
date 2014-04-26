@@ -13,10 +13,6 @@ var kp = require('./kp_functions.js');
 // Load sequential execution functions
 var series = require('./sequential.js');
 
-// Define SSL stuff
-var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
-var certificate = fs.readFileSync('sslcert/public-cert.pem');
-var credentials = {key: privateKey, cert: certificate};
 
 // Load express
 var express = require('express');
@@ -130,7 +126,16 @@ console.log('Server started');
 // Uncomment below if you want server to respond to non-https requests
 // [ ] TODO: Forward non-https to https
 // httpServer.listen(5000);
+
 if (process.env.NODE_ENV == 'production')
-httpServer.listen(process.env.PORT);
+{
+  httpServer.listen(process.env.PORT);
+}
 else
-httpsServer.listen(443);
+{
+  // Define SSL stuff
+  var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
+  var certificate = fs.readFileSync('sslcert/public-cert.pem');
+  var credentials = {key: privateKey, cert: certificate};
+  httpsServer.listen(443);
+}
