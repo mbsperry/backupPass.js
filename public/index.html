@@ -40,7 +40,9 @@
           var index = $("li").index(this);
           var parameters = { index: index };
           $.post('/show', parameters, function(data) {
-            $(".accounts").html(data);
+            $(".accounts").hide("fast");
+            $("#pass_text").show("fast");
+            $("#pass_text").html(data);
           });
         });
       });
@@ -63,6 +65,7 @@
         </form>
 
         <p class="accounts">Loading...</p>
+        <p id="pass_text">Loading...</p>
       </div>
 
       <div id="copyleft">
