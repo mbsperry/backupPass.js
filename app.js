@@ -77,12 +77,13 @@ app.post('/show', function(req, res) {
 });
 
 app.post('/list', function(req, res) {
+  var kdbx_pass = req.body.pass;
 
   var render = function(html) {
     res.send(html);
   };
   // List of functions to be executed sequentially
-  s = [function(next) { write_tmp_file(clear_key, next); }, function(result, next) { list_accts('a test', result, next); } ];
+  s = [function(next) { write_tmp_file(clear_key, next); }, function(result, next) { list_accts(kdbx_pass, result, next); } ];
 
   // This is a little tricky:
   // Takes an array of functions, passes the result from the preceding 

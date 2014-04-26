@@ -29,8 +29,8 @@
             $("#input").css("padding-bottom", "10px");
             $("#input").css("text-align", "left");
             $(".accounts").show("fast");
-            var parameters = { key: $(".key").val() };
-            $.post('/', parameters, function(data) {
+            var parameters = { pass: $("#pass").val() };
+            $.post('/list', parameters, function(data) {
               $(".accounts").html(data);
             });
           });
