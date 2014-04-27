@@ -25,7 +25,7 @@ app.use(bodyParser()); // support for URL-encoded bodies in posts
  */
 
 var passwords = [];
-var clear_key = "";
+var clear_key = false;
 var login_attempts = 0;
 var login_pause = false;
 var lockout = false;
@@ -131,6 +131,7 @@ app.get('/index.js', function(req, res) {
 app.post('/show', function(req, res) {
   var index= req.body.index;
   html = "<span>Password: " + passwords[index] +"</span>";
+  passwords = [];
   res.send(html);
 });
 
@@ -167,6 +168,10 @@ app.post('/auth', function(req, res) {
       clear_key = test_key;
       console.log(clear_key);
       break;
+    }
+    else {
+      // Must set this explicitely to avoid memory
+      clear_key = false;
     }
   }
 

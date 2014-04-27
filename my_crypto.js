@@ -6,16 +6,13 @@ var fs = require('fs');
 
 //var key = fs.ReadFileSync('key.txt');
 
+// Depracated
 var make_hash = function (key, next) {
-
   var file_s = fs.ReadStream('./app.js');
-
   hmac = crypto.createHmac('sha1', key);
-
   file_s.on('data', function (data) {
     hmac.update(data);
   });
-
   file_s.on('end', function() {
     hash = hmac.digest('hex');
     next(hash);
@@ -51,15 +48,14 @@ var write_encrypted_phrase = function (phrase, hash, filename) {
 
 var decrypt_phrase = function (key, file, next) {
   console.log("Decrypting: " + file);
-  var crypt = fs.readFileSync(file, 'hex');
-  var phrase = decrypt(crypt, key);
-  console.log("Clear phrase: " + phrase);
-  return phrase;
-  //make_hash(key, function(hash) {
-    //var phrase = decrypt(crypt, hash);
-    //console.log(phrase);
-    //next(phrase);
-  //});
+  try {
+    var crypt = fs.readFileSync(file, 'hex');
+    var phrase = decrypt(crypt, key);
+    console.log("Clear phrase: " + phrase);
+    return phrase;
+  } catch (err) {
+    return false;
+  }
 };
 
 
