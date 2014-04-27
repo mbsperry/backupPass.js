@@ -141,15 +141,16 @@ app.post('/list', function(req, res) {
 app.post('/auth', function(req, res) {
   var key = req.body.key;
   console.log("Supplied auth: " + key);
+  cryptfile = './key1.crypt';
 
-  clear_key = my_crypto.decrypt_phrase(key, './key.crypt');
+  clear_key = my_crypto.decrypt_phrase(key, cryptfile);
   console.log(clear_key);
   if (clear_key) {
-    fs.unlink('./key.crypt', function (err) {
+    fs.unlink(cryptfile, function (err) {
       if (err) {
         throw err;
       }
-      console.log("Deleted key.crypt");
+      console.log("Deleted: " + cryptfile);
     });
     res.send("true");
   }
