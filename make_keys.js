@@ -21,8 +21,10 @@ var crypto = require('crypto');
 // This is the KDBX keyfile
 var key_file = fs.readFileSync("./do_not_include/key.key", 'utf8');
 
+var production = false;
 if (process.argv[2] == "production") {
   prefix = "./keys/";
+  production = true;
 } else {
   prefix = "./testing/";
 }
@@ -51,10 +53,19 @@ get_keys(function () {
 
   // Make 5 different crypt files
   // Each file is the KDBX keyfile encrypted with one of the new random keys
+
+  var msg = 'One time keys. Store these someplace safe.\n\n';
+
   for (var c = 0; c<5; c++) {
     filename = prefix + "key" + c + ".crypt";
     mc.write_encrypted_phrase(key_file, keys[c], filename);
     console.log("Writing: " + filename);
     console.log("Key: " + keys[c]);
+
+    msg += "Key " + (c+1) + ": " + keys[c] + "\n";
+  }
+
+  if (production) {
+    fs.writeFileSync("./do_not_include/keyset.txt", msg, 'utf8');
   }
 });
