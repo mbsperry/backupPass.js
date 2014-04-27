@@ -31,6 +31,12 @@ h3 {
   display: none;
 }
 
+#acct_headline {
+  display: none;
+  color: black;
+  text-align: right;
+}
+
 #input {
   border:2px solid;
   border-radius:5px;

@@ -40,6 +40,7 @@ $(document).ready(function() {
         $.post('/list', parameters, function(data) {
           $("#accounts").html(data);
           $("#verify").hide("fast");
+          $("#acct_headline").show("fast");
           $("#accounts").show("fast");
         });
       });
