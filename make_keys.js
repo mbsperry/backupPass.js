@@ -1,3 +1,19 @@
+/*
+ *
+ *
+ * Generates 5 one-time use encryptions of the KDBX keyfile
+ * Store the KDBX keyfile as key.key inside the "do_not_include" folder
+ *
+ * Usage: node make_keys.js [production]
+ * If production flag is omitted, testing keys are 
+ * generated and stored in ./testing
+ *
+ * Production flag: store keys in ./key, which is included in repo for
+ * deployment
+ *
+ *
+ */
+
 var mc = require('./my_crypto.js');
 var fs = require('fs');
 var crypto = require('crypto');
