@@ -25,6 +25,9 @@ app.use(bodyParser()); // support for URL-encoded bodies in posts
 
 var passwords = [];
 var clear_key = "";
+var login_attempts = 0;
+var login_pause = false;
+var lockout = false;
 
 var write_tmp_file = function (data, next) {
   tmp.file(function _tempFileCreated(err, path, fd) {
@@ -42,6 +45,7 @@ var list_accts = function(key, keyfile, next) {
   kp.get_accts('./keepass/test.kdbx', key, keyfile, function(error, accts, pass) {
     html = "";
     if (error) {
+      bad_login();
       html="Incorrect Password";
     }
     else {
@@ -54,14 +58,45 @@ var list_accts = function(key, keyfile, next) {
   });
 };
 
+var bad_login = function() {
+  login_attempts += 1;
+  login_pause = true;
+
+  setTimeout(function() {
+    login_pause = false;
+  }, 5000);
+
+  if (login_attempts > 2) {
+    lockout = true;
+    server.close();
+  }
+};
+
 /*
  *
  *        Routing
  *
  */
 
+app.all('*', function(req, res, next) {
+  if (lockout === false && login_pause === false) {
+    if (process.env.NODE_ENV == "production") {
+      if (req.headers['x-forwarded-proto']=='https') {
+        next();
+      }
+    } else {
+      next();
+    }
+  }
+});
+
 app.get('/', function (req, res) {
   res.sendfile('./public/index.html');
+});
+
+app.get('/lock', function(req, res) {
+  lockout = true;
+  res.send("Locked");
 });
 
 app.get('/style.css', function(req, res) {
@@ -106,6 +141,7 @@ app.post('/auth', function(req, res) {
     res.send("true");
   }
   else {
+    bad_login();
     res.send("false");
   }
  
@@ -120,7 +156,7 @@ app.post('/auth', function(req, res) {
 
 if (process.env.NODE_ENV == "production")
 {
-  app.listen(process.env.PORT || 5000);
+  var server = app.listen(process.env.PORT || 5000);
   console.log("Server started");
 }
 else
@@ -130,6 +166,6 @@ else
   var certificate = fs.readFileSync('sslcert/public-cert.pem');
   var credentials = {key: privateKey, cert: certificate};
   var httpsServer = https.createServer(credentials, app);
-  httpsServer.listen(8443);
+  var server = httpsServer.listen(8443);
   console.log("Server started");
 }

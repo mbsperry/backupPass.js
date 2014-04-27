@@ -1,3 +1,6 @@
+// Client side jquery logic for BackupPass
+// Copyright Matthew Sperry 2014, distributed under the MIT license
+
 $(document).ready(function() {
 
   $("#key_button").click(function () {
