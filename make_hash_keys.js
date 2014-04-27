@@ -3,7 +3,13 @@ var fs = require('fs');
 var crypto = require('crypto');
 
 // This is the KDBX keyfile
-var key_file = fs.readFileSync("./keepass/key.key", 'utf8');
+var key_file = fs.readFileSync("./do_not_include/key.key", 'utf8');
+
+if (process.argv[2] == "production") {
+  prefix = "./keys/";
+} else {
+  prefix = "./testing/";
+}
 
 var i = 0;
 var keys = [];
@@ -30,7 +36,7 @@ get_keys(function () {
   // Make 5 different crypt files
   // Each file is the KDBX keyfile encrypted with one of the new random keys
   for (var c = 0; c<5; c++) {
-    filename = "./key" + c + ".crypt";
+    filename = prefix + "key" + c + ".crypt";
     mc.write_encrypted_phrase(key_file, keys[c], filename);
     console.log("Writing: " + filename);
     console.log("Key: " + keys[c]);

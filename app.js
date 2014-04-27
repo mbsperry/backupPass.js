@@ -30,6 +30,14 @@ var login_attempts = 0;
 var login_pause = false;
 var lockout = false;
 
+/* 
+ * Writes data to a tmp file
+ * Currently, tmp file does not seem to be cleaned up properly automagically
+ * I manually delete the tmp file later
+ * This is used to pass the KDBX key to keepassio, since it only accepts
+ * it as a file
+ */
+
 var write_tmp_file = function (data, next) {
   tmp.file(function _tempFileCreated(err, path, fd) {
     if (err) throw err;
@@ -41,6 +49,10 @@ var write_tmp_file = function (data, next) {
     next(path);
   });
 };
+
+/*
+ * Generates the list of KeePass accounts
+ */
 
 var list_accts = function(key, keyfile, next) {
   kp.get_accts('./keepass/test.kdbx', key, keyfile, function(error, accts, pass) {
@@ -85,6 +97,8 @@ var bad_login = function() {
  *
  */
 
+// If we're in production mode, only accept https requests
+// x-forwarded-proto is a heroku specific header
 app.all('*', function(req, res, next) {
   if (lockout === false && login_pause === false) {
     if (process.env.NODE_ENV == "production") {
@@ -126,26 +140,28 @@ app.post('/list', function(req, res) {
   var render = function(html) {
     res.send(html);
   };
-  // List of functions to be executed sequentially
-  s = [function(next) { write_tmp_file(clear_key, next); }, function(result, next) { list_accts(kdbx_pass, result, next); } ];
 
-  // This is a little tricky:
-  // Takes an array of functions, passes the result from the preceding 
-  // onto the next, executes in order.
-  // The second argument is the last function to execute, gets the cumulative
-  // result of the preceding operations.
+  // Array of functions, each passes the result to the next.
+  s = [function(next) { write_tmp_file(clear_key, next); }, function(result, next) { list_accts(kdbx_pass, result, next); } ];
   series.series_on_result(s, render);
 
 });
 
+/*
+ * Check if the supplied key properly decrypts the KDBX keyfile
+ */
+
 app.post('/auth', function(req, res) {
   var key = req.body.key;
   console.log("Supplied auth: " + key);
-  //cryptfile = './key1.crypt';
+
   var cryptfile = "";
 
+  // Try to decrypt each of the 5 key files
   for (var i = 0; i<5; i++) {
-    cryptfile = './key' + i + ".crypt";
+    cryptfile = prefix + 'key' + i + ".crypt";
+
+    // false if decyption fails
     test_key = my_crypto.decrypt_phrase(key, cryptfile);
     if (test_key) {
       clear_key = test_key;
@@ -154,6 +170,7 @@ app.post('/auth', function(req, res) {
     }
   }
 
+  // Was the key properly decrypted?
   if (clear_key) {
     fs.unlink(cryptfile, function (err) {
       if (err) {
@@ -179,11 +196,14 @@ app.post('/auth', function(req, res) {
 
 if (process.env.NODE_ENV == "production")
 {
+  var prefix = "./keys/";
   var server = app.listen(process.env.PORT || 5000);
   console.log("Server started");
 }
 else
 {
+  // This is for testing locally
+  var prefix = "./testing/";
   var https = require('https');
   var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
   var certificate = fs.readFileSync('sslcert/public-cert.pem');
