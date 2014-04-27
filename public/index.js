@@ -2,17 +2,20 @@
 // Copyright Matthew Sperry 2014, distributed under the MIT license
 
 $(document).ready(function() {
+  $("#key").focus();
+
   var key_submit = function() {
     $("#key_form").hide("fast", function() {
       var parameters = { key: $("#key").val() };
       $.post('/auth', parameters, function(data) {
         if (data == "true") {
           $("#pass_form").show("fast");
+          $("#pass").focus();
         }
         else { 
           $("#verify").show("fast");
           $("#verify").html("Incorrect authorization" + 
-            "<br>Wait 5 seconds before retrying");
+            "<br>Wait 2 seconds before retrying");
         }
       });
     });

@@ -46,7 +46,7 @@ var list_accts = function(key, keyfile, next) {
     html = "";
     if (error) {
       bad_login();
-      html="Incorrect Password<br>Wait 5 seconds before retrying";
+      html="Incorrect Password<br>Wait 2 seconds before retrying";
     }
     else {
       accts.forEach(function(entry) {
@@ -64,7 +64,7 @@ var bad_login = function() {
 
   setTimeout(function() {
     login_pause = false;
-  }, 5000);
+  }, 2000);
 
   if (login_attempts > 2) {
     lockout = true;
