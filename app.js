@@ -141,10 +141,19 @@ app.post('/list', function(req, res) {
 app.post('/auth', function(req, res) {
   var key = req.body.key;
   console.log("Supplied auth: " + key);
-  cryptfile = './key1.crypt';
+  //cryptfile = './key1.crypt';
+  var cryptfile = "";
 
-  clear_key = my_crypto.decrypt_phrase(key, cryptfile);
-  console.log(clear_key);
+  for (var i = 0; i<5; i++) {
+    cryptfile = './key' + i + ".crypt";
+    test_key = my_crypto.decrypt_phrase(key, cryptfile);
+    if (test_key) {
+      clear_key = test_key;
+      console.log(clear_key);
+      break;
+    }
+  }
+
   if (clear_key) {
     fs.unlink(cryptfile, function (err) {
       if (err) {
