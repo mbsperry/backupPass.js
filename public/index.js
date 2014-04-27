@@ -2,8 +2,7 @@
 // Copyright Matthew Sperry 2014, distributed under the MIT license
 
 $(document).ready(function() {
-
-  $("#key_button").click(function () {
+  var key_submit = function() {
     $("#key_form").hide("fast", function() {
       var parameters = { key: $("#key").val() };
       $.post('/auth', parameters, function(data) {
@@ -12,25 +11,37 @@ $(document).ready(function() {
         }
         else { 
           $("#verify").show("fast");
-          $("#verify").html("Incorrect authorization");
+          $("#verify").html("Incorrect authorization" + 
+            "<br>Wait 5 seconds before retrying");
         }
       });
     });
+  };
+
+  $('#key').keypress(function (e) {
+    if (e.which == 13) {
+      key_submit();
+      return false;    //<---- Add this line
+    }
   });
 
-  $("#pass_button").click(function () {
-    $("#pass_form").hide("fast", function() {
-      $("#input").css("padding-top", "10px");
-      $("#input").css("padding-bottom", "10px");
-      $("#input").css("text-align", "left");
-      $("#verify").show("fast");
-      var parameters = { pass: $("#pass").val() };
-      $.post('/list', parameters, function(data) {
-        $("#accounts").html(data);
-        $("#verify").hide("fast");
-        $("#accounts").show("fast");
+  $("#pass").keypress(function (e) {
+    if (e.which == 13) {
+
+      $("#pass_form").hide("fast", function() {
+        $("#input").css("padding-top", "10px");
+        $("#input").css("padding-bottom", "10px");
+        $("#input").css("text-align", "left");
+        $("#verify").show("fast");
+        var parameters = { pass: $("#pass").val() };
+        $.post('/list', parameters, function(data) {
+          $("#accounts").html(data);
+          $("#verify").hide("fast");
+          $("#accounts").show("fast");
+        });
       });
-    });
+      return false;
+    }
   });
 
   $("ul").on("mouseover", ".acct", function() {

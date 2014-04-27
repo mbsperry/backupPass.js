@@ -50,21 +50,3 @@ h3 {
   float: right;
 }
 
-.button {
-  color: grey; 
-  text-decoration: none; 
-  font-size: .875em; 
-  font-family: helvetica, arial; 
-  font-weight: bold; 
-  position: relative; 
-
-  background: #282828; 
-
-
-  -moz-border-radius: 1px; 
-  -webkit-border-radius: 1px; 
-  border-radius: 2px; 
-
-  border: 0px solid #368DBE; 
-  border-top: 1px solid #c3d6df; 
-}

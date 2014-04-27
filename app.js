@@ -46,7 +46,7 @@ var list_accts = function(key, keyfile, next) {
     html = "";
     if (error) {
       bad_login();
-      html="Incorrect Password";
+      html="Incorrect Password<br>Wait 5 seconds before retrying";
     }
     else {
       accts.forEach(function(entry) {
