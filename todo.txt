@@ -1,7 +1,7 @@
 Things to do
 [X] HTTPS
 [X] Authenticate
-[ ] One-time passwords
+[X] One-time passwords
 [X] 2 second time out between attempts
 [X] Shutdown server after 3 fails
 [ ] Delete kdbx, all encrypted keyfiles after 5 fails
@@ -15,6 +15,6 @@ Things to do
 [X] Show list of Accounts
 [X] Show password for selected account
 [ ] Close connection
-[ ] Delete encrypted keyfile
+[X] Delete encrypted keyfile
 [ ] Purge kdbx from memory
 [ ] Write README
