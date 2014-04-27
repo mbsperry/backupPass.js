@@ -128,6 +128,10 @@ app.get('/index.js', function(req, res) {
   res.sendfile('./public/index.js');
 });
 
+app.get('/jquery-1.11.0.min.js', function(req, res) {
+  res.sendfile('./public/jquery-1.11.0.min.js');
+});
+
 app.post('/show', function(req, res) {
   var index= req.body.index;
   html = "<span>Password: " + passwords[index] +"</span>";

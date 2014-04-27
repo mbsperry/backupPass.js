@@ -1,6 +1,11 @@
 body {
   font-size: 100%;
-  background-color: #282828;
+  background-image: -o-linear-gradient(bottom, #141414 0%, #46444D 100%);
+  background-image: -moz-linear-gradient(bottom, #141414 0%, #46444D 100%);
+  background-image: -webkit-linear-gradient(bottom, #141414 0%, #46444D 100%);
+  background-image: -ms-linear-gradient(bottom, #141414 0%, #46444D 100%);
+  background-image: linear-gradient(to bottom, #141414 0%, #46444D 100%);
+  color: grey;
 }
 
 #app {
@@ -38,7 +43,6 @@ h3 {
 
 #acct_div {
   display: none;
-  color: black;
   text-align: right;
 }
 
@@ -52,10 +56,12 @@ hr {
 }
 
 #input {
+  /*
   border:2px solid;
   border-radius:5px;
   background-color: grey;
-  padding: 20px;
+  */
+  padding-left: 20px;
   padding-top: 30px;
   padding-bottom: 30px;
   text-align: center;

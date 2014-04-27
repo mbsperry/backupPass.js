@@ -2,8 +2,9 @@
   <head>
     <title>BackupPass</title>
 
+    <meta name="robots" content="noindex">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="jquery-1.11.0.min.js"></script>
 
     <script src="index.js"> </script>
   </head>
@@ -13,11 +14,11 @@
       <h3>::: BackupPass :::</h3>
       <div id="input">
         <form name="key_form" id="key_form">
-          <b>Authenticate:</b> <input type="text" name="key" id="key">
+          <b>Authenticate:</b> <input type="text" name="key" id="key" size="80">
         </form>
 
         <form name="pass_form" id="pass_form">
-          <b>Password:</b> <input type="text" name="key" id="pass">
+          <b>Password:</b> <input type="text" name="key" id="pass" size="80">
         </form>
 
         <p id="verify">Loading...</p>
