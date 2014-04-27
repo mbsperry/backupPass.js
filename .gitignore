@@ -1,6 +1,7 @@
 test.js
 setup
 keepass/key.key
+sslcert
 
 
 lib-cov

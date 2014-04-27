@@ -69,6 +69,10 @@ app.get('/style.css', function(req, res) {
   res.sendfile('./public/style.css');
 });
 
+app.get('/index.js', function(req, res) {
+  res.sendfile('./public/index.js');
+});
+
 app.post('/show', function(req, res) {
   var index= req.body.index;
   html = "<span>Password: " + passwords[index] +"</span>";
