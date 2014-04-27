@@ -40,15 +40,14 @@ var write_tmp_file = function (data, next) {
 
 var list_accts = function(key, keyfile, next) {
   kp.get_accts('./keepass/test.kdbx', key, keyfile, function(error, accts, pass) {
+    html = "";
     if (error) {
       html="Incorrect Password";
     }
     else {
-      html = '<ul> ';
       accts.forEach(function(entry) {
-        html += "<li id='acct'>" + entry + "</li>";
+        html += "<li class='acct'>" + entry + "</li>";
       });
-      html += "</ul>";
       passwords = pass;
     }
   next(html);

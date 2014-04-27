@@ -11,8 +11,16 @@ h3 {
   color: grey;
 }
 
-.accounts {
+#verify {
   display: none;
+}
+
+#accounts {
+  display: none;
+}
+
+.acct {
+  cursor: pointer;
 }
 
 #pass_form {

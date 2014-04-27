@@ -12,7 +12,7 @@
     <div id="app">
       <h3>::: BackupPass :::</h3>
       <div id="input">
-        <form name="key_form" class="key_form">
+        <form name="key_form" id="key_form">
           <b>Authenticate:</b> <input type="text" name="key" id="key">
           <input type="button" value="Enter" class="button" id="key_button">
         </form>
@@ -22,7 +22,8 @@
           <input type="button" value="Enter" class="button" id="pass_button">
         </form>
 
-        <p class="accounts">Loading...</p>
+        <p id="verify">Loading...</p>
+        <ul id="accounts"><li class="acct">Place holder...</li></ul>
         <p id="pass_text">Loading...</p>
       </div>
 
