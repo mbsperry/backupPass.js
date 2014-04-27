@@ -2,12 +2,12 @@ Things to do
 [X] HTTPS
 [X] Authenticate
 [ ] One-time passwords
-[ ] 5 second time out between attempts
-[ ] Shutdown server after 5 fails
+[X] 2 second time out between attempts
+[X] Shutdown server after 3 fails
 [ ] Delete kdbx, all encrypted keyfiles after 5 fails
-[ ] Decrypt key file and save to temporary file
 [-] Display image that was encrypted with pswd and md5 hash
 [ ] Display verifcation image or phrase
+[X] Decrypt key file and save to temporary file
 [X] See node-tmp
 [X] Get kdbx password
 [ ] Same things -- after 5 tries delete everything

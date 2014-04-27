@@ -5,6 +5,7 @@ body {
 
 #app {
   margin: 200px;
+  margin-top: 150px;
 }
 
 h3 {
@@ -29,6 +30,10 @@ h3 {
 
 #pass_text {
   display: none;
+}
+
+#acct_headline {
+  font-weight: bold;
 }
 
 #acct_div {

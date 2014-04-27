@@ -1,6 +1,7 @@
 var fs = require('fs');
 var bodyParser = require('body-parser');
 var tmp = require('tmp');
+tmp.setGracefulCleanup();
 
 // Load custom crypto functions
 var my_crypto = require('./my_crypto.js');
@@ -54,6 +55,12 @@ var list_accts = function(key, keyfile, next) {
       });
       passwords = pass;
     }
+  fs.unlink(keyfile, function (err) {
+    if (err) {
+      throw err;
+    }
+    console.log("Deleted: " + keyfile);
+  });
   next(html);
   });
 };
@@ -138,6 +145,12 @@ app.post('/auth', function(req, res) {
   clear_key = my_crypto.decrypt_phrase(key, './key.crypt');
   console.log(clear_key);
   if (clear_key) {
+    fs.unlink('./key.crypt', function (err) {
+      if (err) {
+        throw err;
+      }
+      console.log("Deleted key.crypt");
+    });
     res.send("true");
   }
   else {
