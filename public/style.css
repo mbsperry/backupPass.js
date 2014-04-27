@@ -16,7 +16,7 @@ h3 {
 }
 
 #accounts {
-  display: none;
+  text-align: left;
 }
 
 .acct {
@@ -31,10 +31,19 @@ h3 {
   display: none;
 }
 
-#acct_headline {
+#acct_div {
   display: none;
   color: black;
   text-align: right;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #282828;
+    margin: 1em 0;
+    padding: 0;
 }
 
 #input {

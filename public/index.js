@@ -40,8 +40,7 @@ $(document).ready(function() {
         $.post('/list', parameters, function(data) {
           $("#accounts").html(data);
           $("#verify").hide("fast");
-          $("#acct_headline").show("fast");
-          $("#accounts").show("fast");
+          $("#acct_div").show("fast");
         });
       });
       return false;
@@ -60,6 +59,8 @@ $(document).ready(function() {
     var parameters = { index: index };
     $.post('/show', parameters, function(data) {
       $("#accounts").hide("fast");
+      $("#acct_headline").hide("fast");
+      $("hr").hide("fast");
       $("#pass_text").show("fast");
       $("#pass_text").html(data);
     });
