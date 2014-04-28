@@ -14,7 +14,10 @@ Things to do
 [X] Load kdbx
 [X] Show list of Accounts
 [X] Show password for selected account
-[ ] Close connection
+[-] Close connection // I don't think this is necessary
 [X] Delete encrypted keyfile
-[ ] Purge kdbx from memory
-[ ] Write README
+[-] Purge kdbx from memory // I don't think I need to do this
+[X] Write README
+[ ] rename make_keys.js --> setup.js
+[ ] Add 'initial' option to setup.js
+[ ] ?Only add '/keepass' to git repo on setup?

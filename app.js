@@ -115,10 +115,11 @@ app.get('/', function (req, res) {
   res.sendfile('./public/index.html');
 });
 
-app.get('/lock', function(req, res) {
+// Unused
+/*app.get('/lock', function(req, res) {
   lockout = true;
   res.send("Locked");
-});
+});*/
 
 app.get('/style.css', function(req, res) {
   res.sendfile('./public/style.css');
@@ -132,13 +133,18 @@ app.get('/jquery-1.11.0.min.js', function(req, res) {
   res.sendfile('./public/jquery-1.11.0.min.js');
 });
 
+// Show password
 app.post('/show', function(req, res) {
+
+  // Index from html account list
   var index= req.body.index;
+
   html = "<span>Password: " + passwords[index] +"</span>";
   passwords = [];
   res.send(html);
 });
 
+// Show account list
 app.post('/list', function(req, res) {
   var kdbx_pass = req.body.pass;
 
