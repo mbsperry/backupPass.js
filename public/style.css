@@ -1,20 +1,49 @@
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,p,blockquote,th,td {  
+	margin:0; 
+	padding:0; 
+}
+
 body {
-  font-size: 100%;
+  font-size: 75%;
   background-image: -o-linear-gradient(bottom, #141414 0%, #46444D 100%);
   background-image: -moz-linear-gradient(bottom, #141414 0%, #46444D 100%);
   background-image: -webkit-linear-gradient(bottom, #141414 0%, #46444D 100%);
   background-image: -ms-linear-gradient(bottom, #141414 0%, #46444D 100%);
   background-image: linear-gradient(to bottom, #141414 0%, #46444D 100%);
-  color: grey;
+  color: #fff;
+  text-align: center;
 }
 
-#app {
-  margin: 200px;
-  margin-top: 150px;
+html>body {
+  font-size: 17px;
 }
 
-h3 {
-  color: grey;
+p {
+  line-height: 1.5em;
+  color: #fff;
+  text-align: left;
+}
+
+li {
+  margin-bottom: .15em;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 2px solid #2B3E50;
+    margin: 1em 0;
+    padding: 0;
+}
+
+.title {
+  font-family: Verdana, sans-serif;
+  font-size: 2.5em;
+  font-weight: 700;
+  text-transform: lowercase;
+  text-align: left;
+  margin-bottom: 50px;
 }
 
 #verify {
@@ -39,40 +68,51 @@ h3 {
 
 #acct_headline {
   font-weight: bold;
+  font-size: 1.2em;
 }
 
 #acct_div {
   display: none;
-  text-align: right;
+  text-align: left;
 }
 
-hr {
-    display: block;
-    height: 1px;
-    border: 0;
-    border-top: 1px solid #282828;
-    margin: 1em 0;
-    padding: 0;
+#content {
+  padding-left: 30px;
 }
 
-#input {
+#app {
+  display: inline-block;
   /*
   border:2px solid;
   border-radius:5px;
   background-color: grey;
   */
-  padding-left: 20px;
-  padding-top: 30px;
-  padding-bottom: 30px;
-  text-align: center;
+  width: 680px;
+  padding-top: 150px;
+  text-align: right;
   font-family: Verdana, Helvetica, Sans-serif;
+  text-size: 1.5em;
+  text-align: center;
+}
+
+.form {
+  text-transform: uppercase;
+  font-size: 1.3em;
+  text-align: left;
+}
+
+.input_field {
+  margin-top: 0.4em;
+  font-size: 0.75em;
+  font-family: "Andale Mono", monospace; 
 }
 
 #copyleft {
+  display: block;
   font-family: Verdana, sans-serif;
-  font-size: 0.5em;
+  font-size: 0.6em;
+  text-align: right;
   color: grey;
-  padding-top: 5px;
-  float: right;
+  padding-top: 2em;
 }
 
