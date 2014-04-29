@@ -213,7 +213,12 @@ app.post('/auth', function(req, res) {
 
 if (process.env.NODE_ENV == "production")
 {
+  // Use the production keys
   var prefix = "./keys/";
+
+  // Trust heroku's forwarding -- note that this can be spoofed easily
+  app.enable('trust proxy');
+
   var server = app.listen(process.env.PORT || 5000);
   console.log("Server started");
 }
