@@ -29,6 +29,7 @@ var clear_key = false;
 var login_attempts = 0;
 var login_pause = false;
 var lockout = false;
+var logfile = './log.txt';
 
 /* 
  * Writes data to a tmp file
@@ -56,16 +57,18 @@ var write_tmp_file = function (data, next) {
 
 var list_accts = function(key, keyfile, next) {
   kp.get_accts('./keepass/test.kdbx', key, keyfile, function(error, accts, pass) {
-    html = "";
+    var html = "";
     if (error) {
       bad_login();
       html="Incorrect Password<br>Wait 2 seconds before retrying";
+      log("KDBX unlock failed");
     }
     else {
       accts.forEach(function(entry) {
         html += "<li class='acct'>" + entry + "</li>";
       });
       passwords = pass;
+      log('***KDBX unlock success***');
     }
   fs.unlink(keyfile, function (err) {
     if (err) {
@@ -91,6 +94,18 @@ var bad_login = function() {
   }
 };
 
+var log = function() {
+  var logstring = new Date();
+  for (var i in arguments) {
+    logstring += '\n' + arguments[i];
+  }
+  logstring += '\n\n';
+  fs.appendFile(logfile, logstring, function (err) {
+    if (err)
+    throw err;
+  });
+};
+
 /*
  *
  *        Routing
@@ -113,14 +128,7 @@ app.all('*', function(req, res, next) {
 
 app.get('/', function (req, res) {
   res.sendfile('./public/index.html');
-  console.log("Request from: " + req.ip);
 });
-
-// Unused
-/*app.get('/lock', function(req, res) {
-  lockout = true;
-  res.send("Locked");
-});*/
 
 app.get('/style.css', function(req, res) {
   res.sendfile('./public/style.css');
@@ -165,7 +173,9 @@ app.post('/list', function(req, res) {
 
 app.post('/auth', function(req, res) {
   var key = req.body.key;
-  console.log("Supplied auth: " + key);
+
+  logreq = req.ip + ': Decryption request';
+  logdata = 'Supplied key: ' + key;
 
   var cryptfile = "";
 
@@ -181,13 +191,16 @@ app.post('/auth', function(req, res) {
       break;
     }
     else {
-      // Must set this explicitely to avoid memory
+      // Must set this explicitly to avoid memory
       clear_key = false;
     }
   }
 
   // Was the key properly decrypted?
   if (clear_key) {
+    logdata += '\n***Decryption success***';
+    log(logreq, logdata);
+
     fs.unlink(cryptfile, function (err) {
       if (err) {
         throw err;
@@ -197,6 +210,8 @@ app.post('/auth', function(req, res) {
     res.send("true");
   }
   else {
+    logdata += '\nDecryption failed';
+    log(logreq, logdata);
     bad_login();
     res.send("false");
   }

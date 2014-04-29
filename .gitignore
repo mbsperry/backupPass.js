@@ -4,6 +4,7 @@ keepass/key.key
 sslcert
 do_not_include
 testing
+log.txt
 
 
 lib-cov

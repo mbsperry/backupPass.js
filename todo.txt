@@ -1,6 +1,7 @@
 Things to do
 [X] HTTPS
 [X] Authenticate
+[X] Log authentication attempts
 [X] One-time passwords
 [X] 2 second time out between attempts
 [X] Shutdown server after 3 fails
@@ -12,6 +13,7 @@ Things to do
 [X] Get kdbx password
 [ ] Same things -- after 5 tries delete everything
 [X] Load kdbx
+[X] Log KDBX unlock attempts
 [X] Show list of Accounts
 [X] Show password for selected account
 [-] Close connection // I don't think this is necessary
