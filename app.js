@@ -113,6 +113,7 @@ app.all('*', function(req, res, next) {
 
 app.get('/', function (req, res) {
   res.sendfile('./public/index.html');
+  console.log("Request from: " + req.ip);
 });
 
 // Unused
@@ -208,6 +209,7 @@ app.post('/auth', function(req, res) {
  *        Start the server
  *
  */
+
 
 if (process.env.NODE_ENV == "production")
 {
