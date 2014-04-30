@@ -148,7 +148,7 @@ app.post('/show', function(req, res) {
   // Index from html account list
   var index= req.body.index;
 
-  html = "<span>Password: " + passwords[index] +"</span>";
+  var html = "<span>Password: " + passwords[index] +"</span>";
   passwords = [];
   res.send(html);
 });
@@ -162,7 +162,7 @@ app.post('/list', function(req, res) {
   };
 
   // Array of functions, each passes the result to the next.
-  s = [function(next) { write_tmp_file(clear_key, next); }, function(result, next) { list_accts(kdbx_pass, result, next); } ];
+  var s = [function(next) { write_tmp_file(clear_key, next); }, function(result, next) { list_accts(kdbx_pass, result, next); } ];
   series.series_on_result(s, render);
 
 });
@@ -174,8 +174,8 @@ app.post('/list', function(req, res) {
 app.post('/auth', function(req, res) {
   var key = req.body.key;
 
-  logreq = req.ip + ': Decryption request';
-  logdata = 'Supplied key: ' + key;
+  var logreq = req.ip + ': Decryption request';
+  var logdata = 'Supplied key: ' + key;
 
   var cryptfile = "";
 
@@ -184,7 +184,7 @@ app.post('/auth', function(req, res) {
     cryptfile = prefix + 'key' + i + ".crypt";
 
     // false if decyption fails
-    test_key = my_crypto.decrypt_phrase(key, cryptfile);
+    var test_key = my_crypto.decrypt_phrase(key, cryptfile);
     if (test_key) {
       clear_key = test_key;
       console.log(clear_key);
