@@ -1,6 +1,5 @@
 var fs = require('fs');
 var bodyParser = require('body-parser');
-var EventEmitter = require('events').EventEmitter;
 var tmp = require('tmp');
 tmp.setGracefulCleanup();
 
@@ -161,22 +160,15 @@ app.post('/show', function(req, res) {
 // Show account list
 app.post('/list', function(req, res) {
   var kdbx_pass = req.body.pass;
-  var emitter = new EventEmitter();
 
   var render = function(html) {
     res.send(html);
   };
 
   write_tmp_file(clear_key, function next(path) {
-    emitter.emit("file", path);
+    list_accts(kdbx_pass, path, render);
   });
 
-  // Emits when the tmp file is ready
-  emitter.on("file", function (path) {
-    list_accts(kdbx_pass, path, function next(html) {
-      render(html);
-    });
-  });
 });
 
 /*
