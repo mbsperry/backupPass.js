@@ -1,5 +1,6 @@
 var fs = require('fs');
 var bodyParser = require('body-parser');
+var EventEmitter = require('events').EventEmitter;
 var tmp = require('tmp');
 tmp.setGracefulCleanup();
 
@@ -8,10 +9,6 @@ var my_crypto = require('./my_crypto.js');
 
 // Load KeePassIO functions
 var kp = require('./kp_functions.js');
-
-// Load sequential execution functions
-var series = require('./sequential.js');
-
 
 // Load express
 var express = require('express');
@@ -156,15 +153,22 @@ app.post('/show', function(req, res) {
 // Show account list
 app.post('/list', function(req, res) {
   var kdbx_pass = req.body.pass;
+  var emitter = new EventEmitter();
 
   var render = function(html) {
     res.send(html);
   };
 
-  // Array of functions, each passes the result to the next.
-  var s = [function(next) { write_tmp_file(clear_key, next); }, function(result, next) { list_accts(kdbx_pass, result, next); } ];
-  series.series_on_result(s, render);
+  write_tmp_file(clear_key, function next(path) {
+    emitter.emit("file", path);
+  });
 
+  // Emits when the tmp file is ready
+  emitter.on("file", function (path) {
+    list_accts(kdbx_pass, path, function next(html) {
+      render(html);
+    });
+  });
 });
 
 /*
