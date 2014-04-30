@@ -27,6 +27,9 @@ var login_attempts = 0;
 var login_pause = false;
 var lockout = false;
 var logfile = './log.txt';
+var lockfile = './lockfile';
+var prefix;
+var server;
 
 /* 
  * Writes data to a tmp file
@@ -88,6 +91,11 @@ var bad_login = function() {
   if (login_attempts > 2) {
     lockout = true;
     server.close();
+    fs.writeFile('./lockfile', 'Server locked', function write(err) {
+      if (err) 
+        throw err;
+    });
+    log('Server locked');
   }
 };
 
@@ -230,26 +238,34 @@ app.post('/auth', function(req, res) {
  */
 
 
-if (process.env.NODE_ENV == "production")
-{
-  // Use the production keys
-  var prefix = "./keys/";
+try {
+  fs.readFileSync('./lockfile');
+    console.log("locked");
+} catch (err) {
+  // Only start the server if the file doesn't exist
 
-  // Trust heroku's forwarding -- note that this can be spoofed easily
-  app.enable('trust proxy');
+  if (process.env.NODE_ENV == "production")
+  {
+    // Use the production keys
+    prefix = "./keys/";
 
-  var server = app.listen(process.env.PORT || 5000);
-  console.log("Server started");
-}
-else
-{
-  // This is for testing locally
-  var prefix = "./testing/";
-  var https = require('https');
-  var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
-  var certificate = fs.readFileSync('sslcert/public-cert.pem');
-  var credentials = {key: privateKey, cert: certificate};
-  var httpsServer = https.createServer(credentials, app);
-  var server = httpsServer.listen(8443);
-  console.log("Server started");
+    // Trust heroku's forwarding -- note that this can be spoofed easily
+    app.enable('trust proxy');
+
+    server = app.listen(process.env.PORT || 5000);
+    console.log("Server started");
+  }
+  else
+  {
+    // This is for testing locally
+    prefix = "./testing/";
+    var https = require('https');
+    var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
+    var certificate = fs.readFileSync('sslcert/public-cert.pem');
+    var credentials = {key: privateKey, cert: certificate};
+    var httpsServer = https.createServer(credentials, app);
+    server = httpsServer.listen(8443);
+    console.log("Server started");
+  }
+
 }

@@ -5,6 +5,7 @@ sslcert
 do_not_include
 testing
 log.txt
+lockfile
 
 
 lib-cov
