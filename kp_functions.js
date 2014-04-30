@@ -1,9 +1,9 @@
 var keepassio = require('keepass.io');
 
 function get_accts(key_db, passwd, keyfile, next) {
-  accts = [];
-  pass = [];
-  db = new keepassio();
+  var accts = [];
+  var pass = [];
+  var db = new keepassio();
 
   db.setCredentials( {
     password: passwd,
@@ -35,8 +35,6 @@ function get_accts(key_db, passwd, keyfile, next) {
   });
 
 }
-
-//get_accts('./keepass/test.kdbx', 'a test', './keepass/key.key');
 
 module.exports.get_accts = get_accts;
 

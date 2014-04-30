@@ -1,23 +1,8 @@
-// Not currently using hash of app file, I decided this didn't add much
-// to security. Can reconsider later
+// my_crypto.js
+// Defines backup.pass specific cryptographic functions
 
 var crypto = require('crypto');
 var fs = require('fs');
-
-//var key = fs.ReadFileSync('key.txt');
-
-// Depracated
-var make_hash = function (key, next) {
-  var file_s = fs.ReadStream('./app.js');
-  hmac = crypto.createHmac('sha1', key);
-  file_s.on('data', function (data) {
-    hmac.update(data);
-  });
-  file_s.on('end', function() {
-    hash = hmac.digest('hex');
-    next(hash);
-  });
-};
 
 var encrypt = function (text, key) {
   var cipher = crypto.createCipher('aes-256-cbc', key);
@@ -38,6 +23,7 @@ var decrypt = function (text, key) {
   }
 };
 
+// This is only ever called during setup, so synchronous makes sense
 var write_encrypted_phrase = function (phrase, hash, filename) {
   var c = encrypt(phrase, hash);
   fs.writeFileSync(filename, c, 'hex', function (err) {
@@ -46,6 +32,7 @@ var write_encrypted_phrase = function (phrase, hash, filename) {
   });
 };
 
+// This should probably be converted to asynchronous...
 var decrypt_phrase = function (key, file, next) {
   console.log("Decrypting: " + file);
   try {
@@ -59,7 +46,6 @@ var decrypt_phrase = function (key, file, next) {
 };
 
 
-module.exports.make_hash = make_hash;
 module.exports.encrypt = encrypt;
 module.exports.decrypt = decrypt;
 module.exports.write_encrypted_phrase = write_encrypted_phrase;
