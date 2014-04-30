@@ -18,6 +18,9 @@ var mc = require('./my_crypto.js');
 var fs = require('fs');
 var crypto = require('crypto');
 
+var prefix;
+var filename;
+
 // This is the KDBX keyfile
 var key_file = fs.readFileSync("./do_not_include/key.key", 'utf8');
 
@@ -47,6 +50,15 @@ var get_keys = function (next) {
     next();
   }
 };
+
+// Delete lockfile, if present
+fs.unlink('./lockfile', function (err) {
+  if (err) {
+    console.log("No lockfile present");
+  } else {
+    console.log("Lockfile deleted");
+  }
+});
 
 get_keys(function () {
   console.log(keys.length);
