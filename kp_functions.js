@@ -22,16 +22,17 @@ function get_accts(key_db, passwd, keyfile, next) {
 
      // each entry has a title, username, password
       for (var entry in groups[prop].entries) {
+        accts.push(groups[prop].entries[entry]);
         var title = groups[prop].entries[entry].title;
         var passwd = groups[prop].entries[entry].password;
-        accts.push(title);
+        //accts.push(title);
         pass.push(passwd);
       }
 
     }
 
     // Execute callback
-    return next(error, accts, pass);
+    return next(error, accts);
   });
 
 }

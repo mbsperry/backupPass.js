@@ -20,7 +20,7 @@ app.use(bodyParser()); // support for URL-encoded bodies in posts
  *
  */
 
-var passwords = [];
+var accounts;
 var clear_key = false;
 var login_attempts = 0;
 var login_pause = false;
@@ -56,7 +56,7 @@ var write_tmp_file = function (data, next) {
 
 var list_accts = function(key, keyfile, next) {
   
-  var make_html = function(err, accts, pass) {
+  var make_html = function(err, accts) {
     var html = "";
     if (err) {
       bad_login();
@@ -65,9 +65,8 @@ var list_accts = function(key, keyfile, next) {
     }
     else {
       accts.forEach(function(entry) {
-        html += "<p class='acct'>" + entry + "</p>";
+        html += "<p class='acct'>" + entry.title + "</p>";
       });
-      passwords = pass;
       log('***KDBX unlock success***');
     }
     fs.unlink(keyfile, function (err) {
@@ -76,6 +75,7 @@ var list_accts = function(key, keyfile, next) {
       }
       console.log("Deleted: " + keyfile);
     });
+    accounts = accts;
     next(html);
   };
 
@@ -156,10 +156,12 @@ app.post('/show', function(req, res) {
   // Index from html account list
   var index= req.body.index;
 
-  var html = "<tr><td>Username:</td><td>More information</td></tr>";
-  html += "<tr><td>Notes:</td><td>More information<br>Even More<br>and more</td></tr>";
-  html += "<tr><td>Password:</td><td>" + passwords[index] +"</td></tr>";
-  passwords = [];
+  var notes = accounts[index].notes.split('\n').join('<br>');
+
+  var html = "<tr><td>Username:</td><td>" + accounts[index].username + "</td></tr>";
+  html += "<tr><td>Password:</td><td>" + accounts[index].password +"</td></tr>";
+  html += "<tr><td>Notes:</td><td>" + notes + "</td></tr>";
+  accounts = [];
   res.send(html);
 });
 

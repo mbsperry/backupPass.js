@@ -66,7 +66,7 @@ $(document).ready(function() {
       $("#accounts").hide("fast");
       $("#acct_headline").html(acct);
       $("#pass_text").html(data);
-      $("#pass_text").show("fast");
+      $("#pass_text").show();
     });
   });
 });
