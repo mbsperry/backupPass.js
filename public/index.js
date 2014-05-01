@@ -6,6 +6,10 @@
 
 
 $(document).ready(function() {
+  $.get('/version', function(data) {
+    $("#version").html(data);
+  });
+
   $("#key").focus();
 
   var key_submit = function() {

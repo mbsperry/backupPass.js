@@ -20,6 +20,7 @@ app.use(bodyParser()); // support for URL-encoded bodies in posts
  *
  */
 
+var pjson = require('./package.json');
 var accounts;
 var clear_key = false;
 var login_attempts = 0;
@@ -138,6 +139,10 @@ app.get('/', function (req, res) {
   res.sendfile('./public/index.html');
 });
 
+app.get('/version', function(req, res) {
+  res.send(pjson.version);
+});
+
 app.get('/style.css', function(req, res) {
   res.sendfile('./public/style.css');
 });
@@ -213,12 +218,12 @@ app.post('/auth', function(req, res) {
     logdata += '\n***Decryption success***';
     log(logreq, logdata);
 
-    //fs.unlink(cryptfile, function (err) {
-      //if (err) {
-        //throw err;
-      //}
-      //console.log("Deleted: " + cryptfile);
-    //});
+    fs.unlink(cryptfile, function (err) {
+      if (err) {
+        throw err;
+      }
+      console.log("Deleted: " + cryptfile);
+    });
     res.send("true");
   }
   else {
