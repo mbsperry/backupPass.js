@@ -156,7 +156,9 @@ app.post('/show', function(req, res) {
   // Index from html account list
   var index= req.body.index;
 
-  var html = "<span>Password: " + passwords[index] +"</span>";
+  var html = "<tr><td>Username:</td><td>More information</td></tr>";
+  html += "<tr><td>Notes:</td><td>More information<br>Even More<br>and more</td></tr>";
+  html += "<tr><td>Password:</td><td>" + passwords[index] +"</td></tr>";
   passwords = [];
   res.send(html);
 });
@@ -209,12 +211,12 @@ app.post('/auth', function(req, res) {
     logdata += '\n***Decryption success***';
     log(logreq, logdata);
 
-    fs.unlink(cryptfile, function (err) {
-      if (err) {
-        throw err;
-      }
-      console.log("Deleted: " + cryptfile);
-    });
+    //fs.unlink(cryptfile, function (err) {
+      //if (err) {
+        //throw err;
+      //}
+      //console.log("Deleted: " + cryptfile);
+    //});
     res.send("true");
   }
   else {

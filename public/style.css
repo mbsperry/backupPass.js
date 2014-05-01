@@ -24,9 +24,11 @@ p {
   text-align: left;
 }
 
-li {
-  margin-bottom: .15em;
-  list-style-type: none;
+td {
+	vertical-align: top;
+	padding-bottom: 0.5em;
+	padding-right: 0.4em;
+	
 }
 
 hr {

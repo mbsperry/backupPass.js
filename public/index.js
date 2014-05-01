@@ -65,9 +65,8 @@ $(document).ready(function() {
     $.post('/show', parameters, function(data) {
       $("#accounts").hide("fast");
       $("#acct_headline").html(acct);
-      $("hr").hide("fast");
-      $("#pass_text").show("fast");
       $("#pass_text").html(data);
+      $("#pass_text").show("fast");
     });
   });
 });
