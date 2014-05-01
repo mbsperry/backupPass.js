@@ -55,9 +55,10 @@ var write_tmp_file = function (data, next) {
  */
 
 var list_accts = function(key, keyfile, next) {
-  kp.get_accts('./keepass/test.kdbx', key, keyfile, function(error, accts, pass) {
+  
+  var make_html = function(err, accts, pass) {
     var html = "";
-    if (error) {
+    if (err) {
       bad_login();
       html="Incorrect Password<br>Wait 2 seconds before retrying";
       log("KDBX unlock failed");
@@ -69,14 +70,17 @@ var list_accts = function(key, keyfile, next) {
       passwords = pass;
       log('***KDBX unlock success***');
     }
-  fs.unlink(keyfile, function (err) {
-    if (err) {
-      throw err;
-    }
-    console.log("Deleted: " + keyfile);
-  });
-  next(html);
-  });
+    fs.unlink(keyfile, function (err) {
+      if (err) {
+        throw err;
+      }
+      console.log("Deleted: " + keyfile);
+    });
+    next(html);
+  };
+
+  kp.get_accts('./keepass/test.kdbx', key, keyfile, make_html);
+
 };
 
 var bad_login = function() {

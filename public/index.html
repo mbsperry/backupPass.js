@@ -19,17 +19,17 @@
           <p><input type="text" id="key" class="input_field" size="64"></p>
         </form>
 
-        <form id="pass_form" class="form">
+        <form id="pass_form" class="form hidden">
           <p><b>KeePass Password:</b></p> 
           <p><input type="text" id="pass" class="input_field" size="64"></p>
         </form>
 
-        <p id="verify">Loading...</p>
-        <p id="pass_text">Loading...</p>
-        <div id="acct_div">
+        <p id="verify" class="hidden">Loading...</p>
+        <div id="acct_div" class="hidden">
           <p id="acct_headline">Accounts</p>
           <hr>
           <ul id="accounts"><li class="acct">Place holder...</li></ul>
+          <p id="pass_text" class="hidden">Loading...</p>
         </div>
       </div>
       <div id="copyleft">

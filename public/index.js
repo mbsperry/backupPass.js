@@ -1,5 +1,9 @@
+/*global $:false*/
 // Client side jquery logic for BackupPass
 // Copyright Matthew Sperry 2014, distributed under the MIT license
+// Turn on jQuery options for JSHint
+//
+
 
 $(document).ready(function() {
   $("#key").focus();
@@ -56,10 +60,12 @@ $(document).ready(function() {
 
   $("#accounts").on('click', '.acct', function() {
     var index = $("li").index(this);
+    var acct = $("li")[index];
+    alert(acct);
     var parameters = { index: index };
     $.post('/show', parameters, function(data) {
       $("#accounts").hide("fast");
-      $("#acct_headline").hide("fast");
+      $("#acct_headline").html(acct);
       $("hr").hide("fast");
       $("#pass_text").show("fast");
       $("#pass_text").html(data);

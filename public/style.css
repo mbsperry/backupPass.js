@@ -47,8 +47,8 @@ hr {
   margin-bottom: 50px;
 }
 
-#verify {
-  display: none;
+.hidden {
+  display: none
 }
 
 #accounts {
@@ -59,21 +59,12 @@ hr {
   cursor: pointer;
 }
 
-#pass_form {
-  display: none;
-}
-
-#pass_text {
-  display: none;
-}
-
 #acct_headline {
   font-weight: bold;
   font-size: 1.2em;
 }
 
 #acct_div {
-  display: none;
   text-align: left;
 }
 
