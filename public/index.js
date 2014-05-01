@@ -51,17 +51,16 @@ $(document).ready(function() {
     }
   });
 
-  $("ul").on("mouseover", ".acct", function() {
+  $("#accounts").on("mouseover", ".acct", function() {
     $(this).css("font-weight", "bold");
   });
-  $("ul").on("mouseleave", ".acct", function() {
+  $("#accounts").on("mouseleave", ".acct", function() {
     $(this).css("font-weight", "normal");
   });
 
   $("#accounts").on('click', '.acct', function() {
-    var index = $("li").index(this);
-    var acct = $("li")[index];
-    alert(acct);
+    var index = $(".acct").index(this);
+    var acct = $(".acct")[index];
     var parameters = { index: index };
     $.post('/show', parameters, function(data) {
       $("#accounts").hide("fast");

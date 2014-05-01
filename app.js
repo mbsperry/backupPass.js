@@ -65,7 +65,7 @@ var list_accts = function(key, keyfile, next) {
     }
     else {
       accts.forEach(function(entry) {
-        html += "<li class='acct'>" + entry + "</li>";
+        html += "<p class='acct'>" + entry + "</p>";
       });
       passwords = pass;
       log('***KDBX unlock success***');
