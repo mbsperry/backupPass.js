@@ -38,8 +38,7 @@ var checkLoginKey = function (req, res, next) {
 app.enable('trust proxy');
 app.use('/session', session({
   keys: config.sessionKeys, 
-  secure: true,
-  proxy: true,
+  SecureProxy: true,
   httpOnly: true,
   maxage: 300000
 }));
