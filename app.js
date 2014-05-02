@@ -35,6 +35,7 @@ var checkLoginKey = function (req, res, next) {
  *          Setup middleware
  */
 
+app.enable('trust proxy');
 app.use('/session', session({
   keys: config.sessionKeys, 
   secure: true,
@@ -298,7 +299,6 @@ try {
   if (config.mode == "production")
   {
     // Trust heroku's forwarding -- note that this can be spoofed easily
-    app.enable('trust proxy');
 
     server = app.listen(process.env.PORT || 5000);
     console.log("Server started");
