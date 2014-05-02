@@ -39,7 +39,7 @@ app.enable('trust proxy');
 app.use('/session', session({
   keys: config.sessionKeys, 
   secure: true,
-  secureProxy: true,
+  proxy: true,
   httpOnly: true,
   maxage: 300000
 }));
