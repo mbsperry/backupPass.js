@@ -26,6 +26,7 @@ Things to do
 [X] Add lockfile -- set lock to lock server, stop auto restart
 [ ] Email when server locks
 [ ] Error handling
-[ ] Need to use SESSIONS!
+[X] Need to use SESSIONS!
 [ ] Use Helmet.js
 [ ] Only use bodyParser.json
+[ ] Encrypt cookie variables
