@@ -10,7 +10,8 @@
     "express": "4.0.0",
     "body-parser": "~1.0.2",
     "tmp": "~0.0.23",
-    "keepass.io": "~0.2.8"
+    "keepass.io": "~0.2.8",
+    "cookie-session": "~1.0.x"
 
   }
 }

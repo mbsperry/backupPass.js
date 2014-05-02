@@ -20,6 +20,7 @@ var crypto = require('crypto');
 
 var prefix;
 var filename;
+var delete_keys;
 
 // This is the KDBX keyfile
 var key_file = fs.readFileSync("./do_not_include/key.key", 'utf8');
@@ -31,6 +32,49 @@ if (process.argv[2] == "production") {
 } else {
   prefix = "./testing/";
 }
+
+if (process.argv[3]) {
+  delete_keys = process.argv[3];
+} else {
+  delete_keys = true;
+}
+
+var make_config = function(delete_keys, prefix) {
+  var session_keys = [];
+
+  var make_session_keys = function(next) {
+    crypto.randomBytes(32, function(ex, buf) {
+      session_keys.push(buf.toString('hex'));
+        if (session_keys.length < 3) {
+          make_session_keys(next);
+        } else {
+          next();
+        }
+    });
+  };
+
+
+  var write_config = function() {
+    console.log("Writing config file");
+    var config = {
+      mode: process.argv[2],
+      delete_key_files: delete_keys,
+      key_prefix: prefix,
+      sessionKeys: session_keys
+    };
+
+    fs.writeFile("./config.json", JSON.stringify(config), function(err) {
+      if (err) throw err;
+    });
+  };
+
+  make_session_keys(write_config);
+
+};
+
+make_config(delete_keys, prefix);
+
+
 
 var i = 0;
 var keys = [];

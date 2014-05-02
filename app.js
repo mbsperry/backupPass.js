@@ -3,6 +3,9 @@ var bodyParser = require('body-parser');
 var tmp = require('tmp');
 tmp.setGracefulCleanup();
 
+// Load config
+var config = require('./config.json');
+
 // Load custom crypto functions
 var my_crypto = require('./my_crypto.js');
 
@@ -11,7 +14,35 @@ var kp = require('./kp_functions.js');
 
 // Load express
 var express = require('express');
+var session = require('cookie-session');
+
 var app = express();
+
+/*            
+ *            Define middleware
+ */
+
+
+var checkLoginKey = function (req, res, next) {
+  if (req.session.login === true) {
+    next();
+  } else {
+    res.send("Error: invalid session");
+  }
+};
+
+/*
+ *          Setup middleware
+ */
+
+app.use('/session', session({
+  keys: config.sessionKeys, 
+  secure: true,
+  secureProxy: true,
+  httpOnly: true,
+  maxage: 300000
+}));
+app.use('/session/secure', checkLoginKey);
 app.use(bodyParser()); // support for URL-encoded bodies in posts
 
 
@@ -28,7 +59,7 @@ var login_pause = false;
 var lockout = false;
 var logfile = './log.txt';
 var lockfile = './lockfile';
-var prefix;
+var prefix = config.key_prefix;
 var server;
 
 /* 
@@ -55,7 +86,7 @@ var write_tmp_file = function (data, next) {
  * Generates the list of KeePass accounts
  */
 
-var list_accts = function(key, keyfile, next) {
+var list_accts = function(req, key, keyfile, next) {
   
   var make_html = function(err, accts) {
     var html = "";
@@ -77,6 +108,12 @@ var list_accts = function(key, keyfile, next) {
       console.log("Deleted: " + keyfile);
     });
     accounts = accts;
+
+    // Purge all account data from memory in 5 minutes
+    setTimeout(function() {
+      accounts = null;
+    }, 300002);
+
     next(html);
   };
 
@@ -155,8 +192,8 @@ app.get('/jquery-1.11.0.min.js', function(req, res) {
   res.sendfile('./public/jquery-1.11.0.min.js');
 });
 
-// Show password
-app.post('/show', function(req, res) {
+// Show account information
+app.post('/session/secure/show', function(req, res) {
 
   // Index from html account list
   var index= req.body.index;
@@ -166,12 +203,17 @@ app.post('/show', function(req, res) {
   var html = "<tr><td>Username:</td><td>" + accounts[index].username + "</td></tr>";
   html += "<tr><td>Password:</td><td>" + accounts[index].password +"</td></tr>";
   html += "<tr><td>Notes:</td><td>" + notes + "</td></tr>";
-  accounts = [];
+
+  // Delete all session data
+  accounts = null;
+  req.session = null;
+
+  // Send the account information
   res.send(html);
 });
 
 // Show account list
-app.post('/list', function(req, res) {
+app.post('/session/secure/list', function(req, res) {
   var kdbx_pass = req.body.pass;
 
   var render = function(html) {
@@ -179,7 +221,7 @@ app.post('/list', function(req, res) {
   };
 
   write_tmp_file(clear_key, function next(path) {
-    list_accts(kdbx_pass, path, render);
+    list_accts(req, kdbx_pass, path, render);
   });
 
 });
@@ -188,7 +230,7 @@ app.post('/list', function(req, res) {
  * Check if the supplied key properly decrypts the KDBX keyfile
  */
 
-app.post('/auth', function(req, res) {
+app.post('/session/auth', function(req, res) {
   var key = req.body.key;
 
   var logreq = req.ip + ': Decryption request';
@@ -218,12 +260,16 @@ app.post('/auth', function(req, res) {
     logdata += '\n***Decryption success***';
     log(logreq, logdata);
 
-    fs.unlink(cryptfile, function (err) {
-      if (err) {
-        throw err;
-      }
-      console.log("Deleted: " + cryptfile);
-    });
+    if (config.delete_key_files === true) {
+      fs.unlink(cryptfile, function (err) {
+        if (err) {
+          throw err;
+        }
+        console.log("Deleted: " + cryptfile);
+      });
+    }
+    req.session.login = true;
+    console.log(req.session.login_key);
     res.send("true");
   }
   else {
@@ -249,11 +295,8 @@ try {
 } catch (err) {
   // Only start the server if the file doesn't exist
 
-  if (process.env.NODE_ENV == "production")
+  if (config.mode == "production")
   {
-    // Use the production keys
-    prefix = "./keys/";
-
     // Trust heroku's forwarding -- note that this can be spoofed easily
     app.enable('trust proxy');
 
@@ -263,7 +306,6 @@ try {
   else
   {
     // This is for testing locally
-    prefix = "./testing/";
     var https = require('https');
     var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
     var certificate = fs.readFileSync('sslcert/public-cert.pem');

@@ -15,7 +15,7 @@ $(document).ready(function() {
   var key_submit = function() {
     $("#key_form").hide("fast", function() {
       var parameters = { key: $("#key").val() };
-      $.post('/auth', parameters, function(data) {
+      $.post('/session/auth', parameters, function(data) {
         if (data == "true") {
           $("#pass_form").show("fast");
           $("#pass").focus();
@@ -45,7 +45,7 @@ $(document).ready(function() {
         $("#input").css("text-align", "left");
         $("#verify").show("fast");
         var parameters = { pass: $("#pass").val() };
-        $.post('/list', parameters, function(data) {
+        $.post('/session/secure/list', parameters, function(data) {
           $("#accounts").html(data);
           $("#verify").hide("fast");
           $("#acct_div").show("fast");
@@ -66,7 +66,7 @@ $(document).ready(function() {
     var index = $(".acct").index(this);
     var acct = $(".acct")[index];
     var parameters = { index: index };
-    $.post('/show', parameters, function(data) {
+    $.post('/session/secure/show', parameters, function(data) {
       $("#accounts").hide("fast");
       $("#acct_headline").html(acct);
       $("#pass_text").html(data);
