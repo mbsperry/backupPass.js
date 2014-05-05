@@ -17,6 +17,7 @@ var kp = require('./kp_functions.js');
 
 // Load application routes
 var auth = require('./auth.js');
+var post = require('./post.js');
 
 // Load express
 var express = require('express');
@@ -33,6 +34,7 @@ var checkLoginKey = function (req, res, next) {
   if (req.session.login === true) {
     next();
   } else {
+    console.log("Invalid login session");
     res.send("Error: invalid session");
   }
 };
@@ -195,25 +197,9 @@ app.get('/jquery-1.11.0.min.js', function(req, res) {
 });
 
 // Show account information
-app.post('/session/secure/show', function(req, res) {
-
-  // Index from html account list
-  var index= req.body.index;
-
-  var acct_notes = accounts[index].notes.split('\n').join('<br>');
-  var result = {
-    username: accounts[index].username,
-    password: accounts[index].password,
-    notes: acct_notes
-  };
-
-  // Delete all session data
-  accounts = null;
-  req.session = null;
-
-  // Send the account information
-  res.send(result);
-});
+app.post('/session/secure/show', function(req, res, next) {
+  post.show(req, res, accounts, next); 
+}); 
 
 // Show account list
 app.post('/session/secure/list', function(req, res) {

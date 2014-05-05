@@ -79,9 +79,11 @@ describe('authenticate with key', function() {
 });
 
 describe('Authenticate with password', function() {
+  var cookies;
+
   this.timeout(4000);
   
-  beforeEach(function(done) {
+  before(function(done) {
     var waitTime = 2003;
     // Make sure to delete the lockfile if it exists
     try {
@@ -95,12 +97,16 @@ describe('Authenticate with password', function() {
       agent
       .post('/session/auth')
       .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
-      .end(done);
+      .end(function(err, res) {
+        agent.saveCookies(res);
+        done();
+      });
     }, waitTime);
     waitTime = 0;
   });
 
   it('Should return an array with a correct password', function(done) {
+    console.log("starting pass test");
     agent
     .post('/session/secure/list')
     .send({ pass: 'a test' })
@@ -115,6 +121,7 @@ describe('Authenticate with password', function() {
   });
 
   it('should return an account object when given an index', function(done) {
+    console.log("starting incorrect pass test");
     agent
     .post('/session/secure/show')
     .send({ index: 1})
