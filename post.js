@@ -13,8 +13,7 @@ var list_accts = function(req, key, keyfile, next) {
     var acctNames = [];
     if (err) {
       logger.log("KDBX unlock failed");
-      next(new Error("oh no!"));
-      req.bad_login();
+      return next(new Error("bad_login"));
     }
     else {
       accts.forEach(function(entry) {

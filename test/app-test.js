@@ -54,13 +54,12 @@ describe('authenticate with key', function() {
     .expect({ response: true }, done);
   });
 
-  it('should return false with invalid key', function(done) {
+  it('should return 401 with invalid key', function(done) {
     agent
     .post('/session/auth')
     .send({ key: 'invalid key' })
     .expect('Content-Type', /json/)
-    .expect(200)
-    .expect({ response: false }, done);
+    .expect(401, done);
   });
 
   it('should return false with a repeated key', function(done) {
@@ -71,15 +70,12 @@ describe('authenticate with key', function() {
       .post('/session/auth')
       .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
       .expect('Content-Type', /json/)
-      .expect(200)
-      .expect({ response: false }, done);
+      .expect(401, done);
     }, 2003);
   });
 });
 
-describe('Authenticate with password', function() {
-  var cookies;
-
+describe('Authenticate with correct password', function() {
   this.timeout(4000);
   
   before(function(done) {
@@ -135,6 +131,34 @@ describe('Authenticate with password', function() {
 
   });
 
-  it('Should return an 401 with an incorrect password');
+});
+
+describe('Authenticate with incorrect password', function() {
+
+  before(function(done) {
+    // Make sure to delete the lockfile if it exists
+    try {
+      fs.unlinkSync(basepath + '/lockfile');
+    } catch (err) {
+    }
+    // Need to suppy a valid key before each password test
+    // Make sure to wait through timeout from last bad login
+    copyfile('key0.crypt');
+    agent
+    .post('/session/auth')
+    .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
+    .end(function(err, res) {
+      agent.saveCookies(res);
+      done();
+    });
+  });
+
+  it('Should return an 401 with an incorrect password', function(done) {
+    agent
+    .post('/session/secure/list')
+    .send({ pass: 'incorrect password' })
+    .expect('Content-Type', /json/)
+    .expect(401, done);
+  });
 
 });

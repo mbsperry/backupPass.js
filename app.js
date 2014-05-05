@@ -55,10 +55,6 @@ app.use('/session', session({
   maxage: 300000
 }));
 app.use('/session/secure', checkLoginKey);
-app.use(function(req,res,next) {
-  req.bad_login = bad_login;
-  next();
-});
 app.use(bodyParser()); // support for URL-encoded bodies in posts
 
 /* 
@@ -73,25 +69,6 @@ var lockout = false;
 var lockfile = './lockfile';
 var server;
 
-var bad_login = function() {
-  console.log("A bad login attempt");
-  login_attempts += 1;
-  login_pause = true;
-
-  setTimeout(function() {
-    login_pause = false;
-  }, 2000);
-
-  if (login_attempts > 2) {
-    lockout = true;
-    server.close();
-    fs.writeFile('./lockfile', 'Server locked', function write(err) {
-      if (err) 
-        throw err;
-    });
-    logger.log('Server locked');
-  }
-};
 
 /*
  *
@@ -106,6 +83,10 @@ app.all('*', function(req, res, next) {
     if (process.env.NODE_ENV == "production") {
       if (req.headers['x-forwarded-proto']=='https') {
         next();
+      } else {
+        if (config.redirect === true) {
+          res.redirect('https://' + req.host);
+        }
       }
     } else {
       next();
@@ -146,12 +127,36 @@ app.post('/session/auth', auth.check_key);
  *      Error handling
  */
 
-function errorHandler (err, req, res, next) {
-  console.log("Received error: " + err);
-}
+var bad_login = function() {
+  console.log("A bad login attempt");
+  login_attempts += 1;
+  login_pause = true;
+
+  setTimeout(function() {
+    login_pause = false;
+  }, 2000);
+
+  if (login_attempts > 2) {
+    lockout = true;
+    server.close();
+    fs.writeFile('./lockfile', 'Server locked', function write(err) {
+      if (err) 
+        throw err;
+    });
+    logger.log('Server locked');
+  }
+};
 
 app.use(function(err, req, res, next) {
   console.log("Error handler received: " + err);
+
+  // Not sure if I want to do this -- 
+  // maybe allow people another chance at entering password 
+  // before destroying the session?
+  req.session = null;
+
+  res.status(401).send({ error: 'Error: Invalid credentials' } );
+  bad_login();
 });
 
 

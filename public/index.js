@@ -6,6 +6,7 @@
 
 
 $(document).ready(function() {
+  var bad_loginHTML = "Incorrect authorization<br>Wait 2 seconds before retrying"
   $.get('/version', function(data) {
     $("#version").html(data);
   });
@@ -15,16 +16,15 @@ $(document).ready(function() {
   var key_submit = function() {
     $("#key_form").hide("fast", function() {
       var parameters = { key: $("#key").val() };
-      $.post('/session/auth', parameters, function(data) {
+      var resp = $.post('/session/auth', parameters, function(data) {
         if (data.response === true) {
           $("#pass_form").show("fast");
           $("#pass").focus();
         }
-        else { 
-          $("#verify").show("fast");
-          $("#verify").html("Incorrect authorization" + 
-            "<br>Wait 2 seconds before retrying");
-        }
+      })
+      .fail(function() {
+        $("#verify").show("fast");
+        $("#verify").html(bad_loginHTML);
       });
     });
   };
@@ -45,12 +45,17 @@ $(document).ready(function() {
         $("#input").css("text-align", "left");
         $("#verify").show("fast");
         var parameters = { pass: $("#pass").val() };
-        $.post('/session/secure/list', parameters, function(data) {
+        var result = $.post('/session/secure/list', parameters, function(data) {
           var html = "";
           data.forEach(function(entry) {
             html += "<p class='acct'>" + entry + "</p>";
           });
           $("#accounts").html(html);
+          $("#verify").hide("fast");
+          $("#acct_div").show("fast");
+        })
+        .fail(function() {
+          $("#accounts").html(bad_loginHTML);
           $("#verify").hide("fast");
           $("#acct_div").show("fast");
         });

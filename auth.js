@@ -3,7 +3,7 @@ var my_crypto = require('./my_crypto');
 var fs = require('fs');
 var config = require('./config.json');
 
-exports.check_key = function (req, res) {
+exports.check_key = function (req, res, next) {
   var cryptfile = "";
   var key = req.body.key;
 
@@ -46,7 +46,6 @@ exports.check_key = function (req, res) {
   else {
     logdata += '\nDecryption failed';
     log.log(logreq, logdata);
-    req.bad_login();
-    res.send({ response: false });
+    next(new Error("bad_login"));
   }
 };
