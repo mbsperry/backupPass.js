@@ -19,7 +19,6 @@ var copyfile = function(file) {
   var basename = path.basename(file);
   var filepath = basepath + '/data/keys/' + file;
   try {
-    console.log("Writing: ../testing/" + basename);
     fs.writeFileSync(basepath + '/../testing/' + basename, fs.readFileSync(filepath));
   } catch (err) {
     throw err;
@@ -106,7 +105,6 @@ describe('Authenticate with password', function() {
   });
 
   it('Should return an array with a correct password', function(done) {
-    console.log("starting pass test");
     agent
     .post('/session/secure/list')
     .send({ pass: 'a test' })
@@ -121,7 +119,6 @@ describe('Authenticate with password', function() {
   });
 
   it('should return an account object when given an index', function(done) {
-    console.log("checking results of pass test");
     agent
     .post('/session/secure/show')
     .send({ index: 1})
@@ -129,7 +126,6 @@ describe('Authenticate with password', function() {
     .expect(200)
     .end(function (err, res) {
       if (err) return done(err);
-      console.log(res.body);
       res.body.should.be.instanceof(Object);
       res.body.username.should.be.instanceof(String);
       res.body.password.should.be.instanceof(String);

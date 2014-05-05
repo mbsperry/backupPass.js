@@ -30,7 +30,6 @@ var list_accts = function(req, key, keyfile, next) {
     });
 
     req.session.accts = accts;
-    console.log("Session accounts: " + req.session.accts);
     next(null, acctNames);
   };
 

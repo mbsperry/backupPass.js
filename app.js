@@ -67,71 +67,11 @@ app.use(bodyParser()); // support for URL-encoded bodies in posts
  */
 
 var pjson = require('./package.json');
-var accounts;
 var login_attempts = 0;
 var login_pause = false;
 var lockout = false;
 var lockfile = './lockfile';
-var prefix = config.key_prefix;
 var server;
-
-/* 
- * Writes data to a tmp file
- * Currently, tmp file does not seem to be cleaned up properly automagically
- * I manually delete the tmp file later
- * This is used to pass the KDBX key to keepassio, since it only accepts
- * it as a file
- */
-
-var write_tmp_file = function (data, next) {
-  tmp.file(function _tempFileCreated(err, path, fd) {
-    if (err) throw err;
-
-    fs.writeFileSync(path, data, 'utf8');
-    next(path);
-  });
-};
-
-/*
- * Generates the list of KeePass accounts
- */
-
-var list_accts = function(req, key, keyfile, next) {
-  
-  var make_html = function(err, accts) {
-    var html = "";
-    var acctNames = [];
-    if (err) {
-      logger.log("KDBX unlock failed");
-      next(new Error("oh no!"));
-      bad_login();
-    }
-    else {
-      accts.forEach(function(entry) {
-        acctNames.push(entry.title);
-        //html += "<p class='acct'>" + entry.title + "</p>";
-      });
-      logger.log('***KDBX unlock success***');
-    }
-    fs.unlink(keyfile, function (err) {
-      if (err) {
-        throw err;
-      }
-      console.log("Deleted: " + keyfile);
-    });
-    accounts = accts;
-
-    // Purge all account data from memory in 5 minutes
-    setTimeout(function() {
-      accounts = null;
-    }, 300002);
-
-    next(null, acctNames);
-  };
-
-  kp.get_accts('./keepass/test.kdbx', key, keyfile, make_html);
-
-};
 
 var bad_login = function() {
   console.log("A bad login attempt");
@@ -161,8 +101,6 @@ var bad_login = function() {
 
 // If we're in production mode, only accept https requests
 // x-forwarded-proto is a heroku specific header
-
-
 app.all('*', function(req, res, next) {
   if (lockout === false && login_pause === false) {
     if (process.env.NODE_ENV == "production") {
@@ -196,19 +134,12 @@ app.get('/jquery-1.11.0.min.js', function(req, res) {
 });
 
 // Show account information
-app.post('/session/secure/show', function(req, res, next) {
-  post.show(req, res, next); 
-}); 
+app.post('/session/secure/show', post.show);
 
 // Show account list
-app.post('/session/secure/list', function(req, res, next) {
-  post.list(req, res, next);
-});
+app.post('/session/secure/list', post.list);
 
-/*
- * Check if the supplied key properly decrypts the KDBX keyfile
- */
-
+// Check key
 app.post('/session/auth', auth.check_key);
 
 /*
@@ -217,12 +148,10 @@ app.post('/session/auth', auth.check_key);
 
 function errorHandler (err, req, res, next) {
   console.log("Received error: " + err);
-  console.log(err.stack);
 }
 
 app.use(function(err, req, res, next) {
   console.log("Error handler received: " + err);
-  console.log(err.stack);
 });
 
 
