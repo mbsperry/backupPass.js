@@ -16,7 +16,7 @@ $(document).ready(function() {
     $("#key_form").hide("fast", function() {
       var parameters = { key: $("#key").val() };
       $.post('/session/auth', parameters, function(data) {
-        if (data == "true") {
+        if (data.response === true) {
           $("#pass_form").show("fast");
           $("#pass").focus();
         }
@@ -46,7 +46,11 @@ $(document).ready(function() {
         $("#verify").show("fast");
         var parameters = { pass: $("#pass").val() };
         $.post('/session/secure/list', parameters, function(data) {
-          $("#accounts").html(data);
+          var html = "";
+          data.forEach(function(entry) {
+            html += "<p class='acct'>" + entry + "</p>";
+          });
+          $("#accounts").html(html);
           $("#verify").hide("fast");
           $("#acct_div").show("fast");
         });
@@ -63,13 +67,17 @@ $(document).ready(function() {
   });
 
   $("#accounts").on('click', '.acct', function() {
+    var html = "";
     var index = $(".acct").index(this);
     var acct = $(".acct")[index];
     var parameters = { index: index };
     $.post('/session/secure/show', parameters, function(data) {
       $("#accounts").hide("fast");
+      html += "<tr><td>Username:</td><td>" + data.username + "</td></tr>";
+      html += "<tr><td>Password:</td><td>" + data.password +"</td></tr>";
+      html += "<tr><td>Notes:</td><td>" + data.notes + "</td></tr>";
       $("#acct_headline").html(acct);
-      $("#pass_text").html(data);
+      $("#pass_text").html(html);
       $("#pass_text").show();
     });
   });

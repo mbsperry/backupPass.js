@@ -16,9 +16,9 @@ var decrypt = function (text, key) {
   try {
     var dec = decipher.update(text,'hex','utf8');
     dec += decipher.final('utf8');
+    console.log("Decryption success!");
     return dec;
   } catch (ex) {
-    console.log(ex);
     return false;
   }
 };
@@ -38,7 +38,6 @@ var decrypt_phrase = function (key, file, next) {
   try {
     var crypt = fs.readFileSync(file, 'hex');
     var phrase = decrypt(crypt, key);
-    console.log("Clear phrase: " + phrase);
     return phrase;
   } catch (err) {
     return false;

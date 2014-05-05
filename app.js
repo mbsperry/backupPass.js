@@ -31,6 +31,10 @@ var checkLoginKey = function (req, res, next) {
   }
 };
 
+var checkHTTPS = function (req, res, next) {
+};
+
+
 /*
  *          Setup middleware
  */
@@ -44,7 +48,6 @@ app.use('/session', session({
 }));
 app.use('/session/secure', checkLoginKey);
 app.use(bodyParser()); // support for URL-encoded bodies in posts
-
 
 /* 
  *            Application Logic
@@ -74,9 +77,6 @@ var write_tmp_file = function (data, next) {
   tmp.file(function _tempFileCreated(err, path, fd) {
     if (err) throw err;
 
-    console.log("File: ", path);
-    console.log("File descriptor: ", fd);
-
     fs.writeFileSync(path, data, 'utf8');
     next(path);
   });
@@ -90,14 +90,16 @@ var list_accts = function(req, key, keyfile, next) {
   
   var make_html = function(err, accts) {
     var html = "";
+    var acctNames = [];
     if (err) {
-      bad_login();
-      html="Incorrect Password<br>Wait 2 seconds before retrying";
       log("KDBX unlock failed");
+      next(new Error("oh no!"));
+      bad_login();
     }
     else {
       accts.forEach(function(entry) {
-        html += "<p class='acct'>" + entry.title + "</p>";
+        acctNames.push(entry.title);
+        //html += "<p class='acct'>" + entry.title + "</p>";
       });
       log('***KDBX unlock success***');
     }
@@ -114,7 +116,7 @@ var list_accts = function(req, key, keyfile, next) {
       accounts = null;
     }, 300002);
 
-    next(html);
+    next(null, acctNames);
   };
 
   kp.get_accts('./keepass/test.kdbx', key, keyfile, make_html);
@@ -198,26 +200,28 @@ app.post('/session/secure/show', function(req, res) {
   // Index from html account list
   var index= req.body.index;
 
-  var notes = accounts[index].notes.split('\n').join('<br>');
-
-  var html = "<tr><td>Username:</td><td>" + accounts[index].username + "</td></tr>";
-  html += "<tr><td>Password:</td><td>" + accounts[index].password +"</td></tr>";
-  html += "<tr><td>Notes:</td><td>" + notes + "</td></tr>";
+  var acct_notes = accounts[index].notes.split('\n').join('<br>');
+  var result = {
+    username: accounts[index].username,
+    password: accounts[index].password,
+    notes: acct_notes
+  };
 
   // Delete all session data
   accounts = null;
   req.session = null;
 
   // Send the account information
-  res.send(html);
+  res.send(result);
 });
 
 // Show account list
 app.post('/session/secure/list', function(req, res) {
   var kdbx_pass = req.body.pass;
 
-  var render = function(html) {
-    res.send(html);
+  var render = function(err, acctNames) {
+    if (err) throw err;
+    res.json(acctNames);
   };
 
   write_tmp_file(clear_key, function next(path) {
@@ -269,16 +273,28 @@ app.post('/session/auth', function(req, res) {
       });
     }
     req.session.login = true;
-    console.log(req.session.login_key);
-    res.send("true");
+    res.send({ response: true });
   }
   else {
     logdata += '\nDecryption failed';
     log(logreq, logdata);
     bad_login();
-    res.send("false");
+    res.send({ response: false });
   }
  
+});
+
+/*
+ *      Error handling
+ */
+
+function errorHandler (err, req, res, next) {
+  console.log("Received error: " + err);
+  console.log(err.stack);
+}
+
+app.use(function(err, req, res, next) {
+  console.log("Error handler received: " + err);
 });
 
 
@@ -315,3 +331,5 @@ try {
   }
 
 }
+
+module.exports = server;

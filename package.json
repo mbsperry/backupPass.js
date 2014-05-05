@@ -13,5 +13,11 @@
     "keepass.io": "~0.2.8",
     "cookie-session": "~1.0.x"
 
-  }
+  },
+  "devDependencies": {
+    "mocha": "1.18.x",
+    "supertest": "0.12.x",
+    "should": "3.3.x"
+  },
+  "engine": "node >= 0.10.21"
 }
