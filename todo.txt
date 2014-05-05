@@ -29,5 +29,5 @@ Things to do
 [ ] Differentiate login errors vs server errors
 [X] Need to use SESSIONS!
 [ ] Use Helmet.js
-[ ] Only use bodyParser.json
+[X] Only use bodyParser.json
 [X] Encrypt cookie variables // by default

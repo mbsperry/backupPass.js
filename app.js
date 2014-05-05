@@ -55,7 +55,7 @@ app.use('/session', session({
   maxage: 300000
 }));
 app.use('/session/secure', checkLoginKey);
-app.use(bodyParser()); // support for URL-encoded bodies in posts
+app.use(bodyParser.json()); // support for URL-encoded bodies in posts
 
 /* 
  *            Application Logic
