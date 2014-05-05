@@ -9,8 +9,14 @@ var config = require('./config.json');
 // Load custom crypto functions
 var my_crypto = require('./my_crypto.js');
 
+// Load logger
+var logger = require('./log.js');
+
 // Load KeePassIO functions
 var kp = require('./kp_functions.js');
+
+// Load application routes
+var auth = require('./auth.js');
 
 // Load express
 var express = require('express');
@@ -47,6 +53,11 @@ app.use('/session', session({
   maxage: 300000
 }));
 app.use('/session/secure', checkLoginKey);
+app.use(function(req,res,next) {
+  req.bad_login = bad_login;
+  debugger;
+  next();
+});
 app.use(bodyParser()); // support for URL-encoded bodies in posts
 
 /* 
@@ -56,11 +67,9 @@ app.use(bodyParser()); // support for URL-encoded bodies in posts
 
 var pjson = require('./package.json');
 var accounts;
-var clear_key = false;
 var login_attempts = 0;
 var login_pause = false;
 var lockout = false;
-var logfile = './log.txt';
 var lockfile = './lockfile';
 var prefix = config.key_prefix;
 var server;
@@ -92,7 +101,7 @@ var list_accts = function(req, key, keyfile, next) {
     var html = "";
     var acctNames = [];
     if (err) {
-      log("KDBX unlock failed");
+      logger.log("KDBX unlock failed");
       next(new Error("oh no!"));
       bad_login();
     }
@@ -101,7 +110,7 @@ var list_accts = function(req, key, keyfile, next) {
         acctNames.push(entry.title);
         //html += "<p class='acct'>" + entry.title + "</p>";
       });
-      log('***KDBX unlock success***');
+      logger.log('***KDBX unlock success***');
     }
     fs.unlink(keyfile, function (err) {
       if (err) {
@@ -124,6 +133,7 @@ var list_accts = function(req, key, keyfile, next) {
 };
 
 var bad_login = function() {
+  console.log("A bad login attempt");
   login_attempts += 1;
   login_pause = true;
 
@@ -138,20 +148,8 @@ var bad_login = function() {
       if (err) 
         throw err;
     });
-    log('Server locked');
+    logger.log('Server locked');
   }
-};
-
-var log = function() {
-  var logstring = new Date();
-  for (var i in arguments) {
-    logstring += '\n' + arguments[i];
-  }
-  logstring += '\n\n';
-  fs.appendFile(logfile, logstring, function (err) {
-    if (err)
-    throw err;
-  });
 };
 
 /*
@@ -162,6 +160,8 @@ var log = function() {
 
 // If we're in production mode, only accept https requests
 // x-forwarded-proto is a heroku specific header
+
+
 app.all('*', function(req, res, next) {
   if (lockout === false && login_pause === false) {
     if (process.env.NODE_ENV == "production") {
@@ -224,7 +224,7 @@ app.post('/session/secure/list', function(req, res) {
     res.json(acctNames);
   };
 
-  write_tmp_file(clear_key, function next(path) {
+  write_tmp_file(req.session.clear_key, function next(path) {
     list_accts(req, kdbx_pass, path, render);
   });
 
@@ -234,55 +234,7 @@ app.post('/session/secure/list', function(req, res) {
  * Check if the supplied key properly decrypts the KDBX keyfile
  */
 
-app.post('/session/auth', function(req, res) {
-  var key = req.body.key;
-
-  var logreq = req.ip + ': Decryption request';
-  var logdata = 'Supplied key: ' + key;
-
-  var cryptfile = "";
-
-  // Try to decrypt each of the 5 key files
-  for (var i = 0; i<5; i++) {
-    cryptfile = prefix + 'key' + i + ".crypt";
-
-    // false if decyption fails
-    var test_key = my_crypto.decrypt_phrase(key, cryptfile);
-    if (test_key) {
-      clear_key = test_key;
-      console.log(clear_key);
-      break;
-    }
-    else {
-      // Must set this explicitly to avoid memory
-      clear_key = false;
-    }
-  }
-
-  // Was the key properly decrypted?
-  if (clear_key) {
-    logdata += '\n***Decryption success***';
-    log(logreq, logdata);
-
-    if (config.delete_key_files === true) {
-      fs.unlink(cryptfile, function (err) {
-        if (err) {
-          throw err;
-        }
-        console.log("Deleted: " + cryptfile);
-      });
-    }
-    req.session.login = true;
-    res.send({ response: true });
-  }
-  else {
-    logdata += '\nDecryption failed';
-    log(logreq, logdata);
-    bad_login();
-    res.send({ response: false });
-  }
- 
-});
+app.post('/session/auth', auth.check_key);
 
 /*
  *      Error handling
@@ -295,6 +247,7 @@ function errorHandler (err, req, res, next) {
 
 app.use(function(err, req, res, next) {
   console.log("Error handler received: " + err);
+  console.log(err.stack);
 });
 
 
