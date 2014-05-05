@@ -114,14 +114,14 @@ describe('Authenticate with password', function() {
     .expect(200)
     .end(function (err, res) {
       if (err) return done(err);
-      console.log(res.body);
+      agent.saveCookies(res);
       res.body.should.be.instanceof(Array);
       done();
     });
   });
 
   it('should return an account object when given an index', function(done) {
-    console.log("starting incorrect pass test");
+    console.log("checking results of pass test");
     agent
     .post('/session/secure/show')
     .send({ index: 1})

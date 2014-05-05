@@ -57,7 +57,6 @@ app.use('/session', session({
 app.use('/session/secure', checkLoginKey);
 app.use(function(req,res,next) {
   req.bad_login = bad_login;
-  debugger;
   next();
 });
 app.use(bodyParser()); // support for URL-encoded bodies in posts
@@ -198,22 +197,12 @@ app.get('/jquery-1.11.0.min.js', function(req, res) {
 
 // Show account information
 app.post('/session/secure/show', function(req, res, next) {
-  post.show(req, res, accounts, next); 
+  post.show(req, res, next); 
 }); 
 
 // Show account list
-app.post('/session/secure/list', function(req, res) {
-  var kdbx_pass = req.body.pass;
-
-  var render = function(err, acctNames) {
-    if (err) throw err;
-    res.json(acctNames);
-  };
-
-  write_tmp_file(req.session.clear_key, function next(path) {
-    list_accts(req, kdbx_pass, path, render);
-  });
-
+app.post('/session/secure/list', function(req, res, next) {
+  post.list(req, res, next);
 });
 
 /*
