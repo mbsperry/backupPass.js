@@ -5,6 +5,7 @@
 var fs = require('fs');
 var kp = require('../lib/kp_functions');
 var write_tmp_file = require('../lib/write_tmp_file');
+var config = require('../config.json');
 var logger = require('../lib/log');
 
 /*
@@ -12,6 +13,13 @@ var logger = require('../lib/log');
  */
 
 var list_accts = function(req, key, keyfile, next) {
+  var keydb;
+
+  if (process.env.NODE_ENV == 'test') {
+    keydb = './keepass/testing.kdbx';
+  } else {
+    keydb = config.keeDbPath;
+  }
   
   var make_acct_list = function(err, accts) {
     var acctNames = [];

@@ -1,4 +1,5 @@
 var fs = require('fs');
+var crypto = require('crypto');
 var bodyParser = require('body-parser');
 
 // Load config
@@ -49,8 +50,17 @@ app.use(cookieParser());
 // a single session at any time, so I think it is acceptable to use MemoryStore in
 // this case, even though it does not scale.
 var memStore = new session.MemoryStore();
+
+// Use a randomly generated session key. Persistence is not important in
+// this application.
+try {
+  var sessKey = crypto.randomBytes(32).toString('hex');
+} catch (err) {
+  throw err;
+}
+
 app.use('/session', session({
-  secret: "test",
+  secret: sessKey,
   key: 'sid',
   store: memStore,
   cookie: {

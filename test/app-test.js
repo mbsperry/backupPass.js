@@ -5,8 +5,6 @@ var should = require('should');
 var fs = require('fs');
 var path = require('path');
 
-var app = require('../app.js');
-var agent = request.agent(app);
 
 //request = request('http://localhost:8000');
 process.env.NODE_ENV = 'test';
@@ -25,11 +23,35 @@ var copyfile = function(file) {
   }
 };
 
+var app;
+var agent;
+
+
 before(function(done) {
+  // Delete a lockfile if it exists
+  try {
+    console.log("Deleting lockfile");
+    fs.unlinkSync(basepath + '/../lockfile');
+  } catch (err) {
+    console.log("No lockfile");
+  }
+
+  // Must start app after lockfile has been deleted
+  app = require('../app.js');
+  agent = request.agent(app);
+
   fs.readdir(basepath + '/data/keys', function(err, files) {
     files.forEach(copyfile);
+
+    try {
+      fs.writeFileSync(basepath + '/../keepass/testing.kdbx', fs.readFileSync(basepath + '/data/testing.kdbx'));
     done();
+    } catch (err) {
+      throw err;
+    }
+
   });
+
 });
 
 describe('index', function() {
@@ -161,4 +183,12 @@ describe('Authenticate with incorrect password', function() {
     .expect(401, done);
   });
 
+});
+
+after(function(done) {
+  var testdb = basepath + '/../keepass/testing.kdbx';
+  fs.unlink(testdb, function(err) {
+    if (err) throw err;
+    done();
+  });
 });
