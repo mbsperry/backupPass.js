@@ -1,29 +1,21 @@
 var fs = require('fs');
 var bodyParser = require('body-parser');
-var tmp = require('tmp');
-tmp.setGracefulCleanup();
 
 // Load config
 var config = require('./config.json');
 
-// Load custom crypto functions
-var my_crypto = require('./my_crypto.js');
-
 // Load logger
-var logger = require('./log.js');
-
-// Load KeePassIO functions
-var kp = require('./kp_functions.js');
+var logger = require('./lib/log');
 
 // Load application routes
-var auth = require('./auth.js');
-var post = require('./post.js');
+var auth = require('./routes/auth.js');
+var list = require('./routes/list.js');
+var show = require('./routes/show.js');
 
 // Load express
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
-var memStore = new session.MemoryStore();
 
 var app = express();
 
@@ -52,6 +44,11 @@ var checkHTTPS = function (req, res, next) {
 app.enable('trust proxy');
 app.use(bodyParser.json()); // support for URL-encoded bodies in posts
 app.use(cookieParser());
+
+// This is designed to be a single use web server. It should only be handling
+// a single session at any time, so I think it is acceptable to use MemoryStore in
+// this case, even though it does not scale.
+var memStore = new session.MemoryStore();
 app.use('/session', session({
   secret: "test",
   key: 'sid',
@@ -70,7 +67,7 @@ app.use('/session/secure', checkLoginKey);
  *
  */
 
-var pjson = require('./package.json');
+var version = require('./package.json').version;
 var login_attempts = 0;
 var login_pause = false;
 var lockout = false;
@@ -107,7 +104,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/version', function(req, res) {
-  res.send(pjson.version);
+  res.send(version);
 });
 
 app.get('/style.css', function(req, res) {
@@ -123,13 +120,13 @@ app.get('/jquery-1.11.0.min.js', function(req, res) {
 });
 
 // Show account information
-app.post('/session/secure/show', post.show);
+app.post('/session/secure/show', show);
 
 // Show account list
-app.post('/session/secure/list', post.list);
+app.post('/session/secure/list', list);
 
 // Check key
-app.post('/session/auth', auth.check_key);
+app.post('/session/auth', auth);
 
 /*
  *      Error handling

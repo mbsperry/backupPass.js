@@ -1,16 +1,19 @@
-var log = require('./log.js');
-var my_crypto = require('./my_crypto');
-var fs = require('fs');
-var config = require('./config.json');
+/*
+ * Logic for the '/session/auth' route
+ */
 
-exports.check_key = function (req, res, next) {
+var log = require('../lib/log');
+var my_crypto = require('../lib/my_crypto');
+var fs = require('fs');
+var config = require('../config.json');
+
+module.exports = function (req, res, next) {
   var cryptfile = "";
   var key = req.body.key;
 
   var logreq = req.ip + ': Decryption request';
   var logdata = 'Supplied key: ' + key;
 
-  debugger;
 
   // Try to decrypt each of the 5 key files
   for (var i = 0; i<5; i++) {

@@ -14,7 +14,7 @@
  *
  */
 
-var mc = require('./my_crypto.js');
+var mc = require('./lib/my_crypto.js');
 var fs = require('fs');
 var crypto = require('crypto');
 

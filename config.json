@@ -1,1 +1,1 @@
-{"mode":"production","delete_key_files":true,"key_prefix":"./keys/","sessionKeys":["20b387a1fff9fa7c750d3d35ffd32a5d6febfa07a807bb87c3d67ede19c4ed79","b63a4a04798230093eba2aa6d6199663b4061f98f316107e5bb9a26c7b3f99a7","aacdbbb9e9ea7c84a2f9730b57b7dbc77fc8fb7897d7f86c38c8cdf19ecf4a1d"]}
+{"delete_key_files":true,"key_prefix":"./testing/","sessionKeys":["cad533d49067a20140abde33b79ae1cd89da01783433aa7c694b83a052ea7747","45b80a9cc8fe86e0b2bac84be1fabaa32bed21e5e69b35c98baf05a78a044e2d","62b0ec4d1028ba43f898e2c37306c29e4375d0fabd08eaa60f8bcd29bcd0d43d"]}
