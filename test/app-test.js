@@ -28,6 +28,7 @@ var agent;
 
 
 before(function(done) {
+  this.timeout(4000);
   // Delete a lockfile if it exists
   try {
     console.log("Deleting lockfile");

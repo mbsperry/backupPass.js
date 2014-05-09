@@ -17,8 +17,10 @@ var list_accts = function(req, key, keyfile, next) {
 
   if (process.env.NODE_ENV == 'test') {
     keydb = './keepass/testing.kdbx';
-  } else {
+  } else if (config.keeDbPath) {
     keydb = config.keeDbPath;
+  } else {
+    keydb = './keepass/keepass.kdbx';
   }
   
   var make_acct_list = function(err, accts) {
@@ -44,7 +46,7 @@ var list_accts = function(req, key, keyfile, next) {
     next(null, acctNames);
   };
 
-  kp.get_accts('./keepass/test.kdbx', key, keyfile, make_acct_list);
+  kp.get_accts(keydb, key, keyfile, make_acct_list);
 
 };
 

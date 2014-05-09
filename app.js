@@ -61,11 +61,11 @@ try {
 
 app.use('/session', session({
   secret: sessKey,
-  key: 'sid',
+  key: 'session.sid',
   store: memStore,
+  proxy: true,
   cookie: {
-    keys: config.sessionKeys, 
-    SecureProxy: true,
+    secure: true,
     httpOnly: true,
     maxage: 300000
   }
