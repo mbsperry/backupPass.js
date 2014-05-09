@@ -6,26 +6,40 @@
 
 
 $(document).ready(function() {
-  var bad_loginHTML = "Incorrect authorization<br>Wait 2 seconds before retrying"
+  var bad_loginHTML = "Incorrect authorization<br>Wait 2 seconds before retrying";
   $.get('/version', function(data) {
     $("#version").html(data);
   });
+
+  var send_ajax_post = function(url, data, success) {
+    $.ajax({
+      type: "POST",
+      url: url,
+      contentType: 'application/json',
+      data: JSON.stringify(data),
+      dataType: "json",
+      success: success,
+      error: function() {
+        $("#verify").show("fast");
+        $("#verify").html(bad_loginHTML);
+      }
+    });
+  };
+
+
 
   $("#key").focus();
 
   var key_submit = function() {
     $("#key_form").hide("fast", function() {
-      var parameters = { key: $("#key").val() };
-      var resp = $.post('/session/auth', parameters, function(data) {
+      var parameters = {key: $("#key").val()};
+      var success = function(data) {
         if (data.response === true) {
           $("#pass_form").show("fast");
           $("#pass").focus();
         }
-      })
-      .fail(function() {
-        $("#verify").show("fast");
-        $("#verify").html(bad_loginHTML);
-      });
+      };
+      send_ajax_post('session/auth', parameters, success);
     });
   };
 
@@ -45,7 +59,7 @@ $(document).ready(function() {
         $("#input").css("text-align", "left");
         $("#verify").show("fast");
         var parameters = { pass: $("#pass").val() };
-        var result = $.post('/session/secure/list', parameters, function(data) {
+        var success = function(data) {
           var html = "";
           data.forEach(function(entry) {
             html += "<p class='acct'>" + entry + "</p>";
@@ -53,12 +67,13 @@ $(document).ready(function() {
           $("#accounts").html(html);
           $("#verify").hide("fast");
           $("#acct_div").show("fast");
-        })
-        .fail(function() {
-          $("#accounts").html(bad_loginHTML);
-          $("#verify").hide("fast");
-          $("#acct_div").show("fast");
-        });
+        };
+        send_ajax_post('/session/secure/list', parameters, success);
+        //.fail(function() {
+          //$("#accounts").html(bad_loginHTML);
+          //$("#verify").hide("fast");
+          //$("#acct_div").show("fast");
+        //});
       });
       return false;
     }
@@ -76,7 +91,7 @@ $(document).ready(function() {
     var index = $(".acct").index(this);
     var acct = $(".acct")[index];
     var parameters = { index: index };
-    $.post('/session/secure/show', parameters, function(data) {
+    var success = function(data) {
       $("#accounts").hide("fast");
       html += "<tr><td>Username:</td><td>" + data.username + "</td></tr>";
       html += "<tr><td>Password:</td><td>" + data.password +"</td></tr>";
@@ -84,7 +99,8 @@ $(document).ready(function() {
       $("#acct_headline").html(acct);
       $("#pass_text").html(html);
       $("#pass_text").show();
-    });
+    };
+    send_ajax_post('/session/secure/show', parameters, success);
   });
 });
 

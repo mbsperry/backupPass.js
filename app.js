@@ -50,7 +50,7 @@ var checkHTTPS = function (req, res, next) {
  */
 
 app.enable('trust proxy');
-app.use(bodyParser.urlencoded()); // support for URL-encoded bodies in posts
+app.use(bodyParser.json()); // support for URL-encoded bodies in posts
 app.use(cookieParser());
 app.use('/session', session({
   secret: "test",
