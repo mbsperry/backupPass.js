@@ -48,6 +48,7 @@ describe('authenticate with key', function() {
   it('should should return true', function(done) {
     agent
     .post('/session/auth')
+    .type('form')
     .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
     .expect('Content-Type', /json/)
     .expect(200)
@@ -57,6 +58,7 @@ describe('authenticate with key', function() {
   it('should return 401 with invalid key', function(done) {
     agent
     .post('/session/auth')
+    .type('form')
     .send({ key: 'invalid key' })
     .expect('Content-Type', /json/)
     .expect(401, done);
@@ -68,6 +70,7 @@ describe('authenticate with key', function() {
       // Need to wait for the bad login timeout...
       agent
       .post('/session/auth')
+      .type('form')
       .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
       .expect('Content-Type', /json/)
       .expect(401, done);
@@ -91,6 +94,7 @@ describe('Authenticate with correct password', function() {
       copyfile('key0.crypt');
       agent
       .post('/session/auth')
+      .type('form')
       .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
       .end(function(err, res) {
         agent.saveCookies(res);
@@ -103,6 +107,7 @@ describe('Authenticate with correct password', function() {
   it('Should return an array with a correct password', function(done) {
     agent
     .post('/session/secure/list')
+    .type('form')
     .send({ pass: 'a test' })
     .expect('Content-Type', /json/)
     .expect(200)
@@ -117,6 +122,7 @@ describe('Authenticate with correct password', function() {
   it('should return an account object when given an index', function(done) {
     agent
     .post('/session/secure/show')
+    .type('form')
     .send({ index: 1})
     .expect('Content-Type', /json/)
     .expect(200)
@@ -146,6 +152,7 @@ describe('Authenticate with incorrect password', function() {
     copyfile('key0.crypt');
     agent
     .post('/session/auth')
+    .type('form')
     .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
     .end(function(err, res) {
       agent.saveCookies(res);
@@ -156,6 +163,7 @@ describe('Authenticate with incorrect password', function() {
   it('Should return an 401 with an incorrect password', function(done) {
     agent
     .post('/session/secure/list')
+    .type('form')
     .send({ pass: 'incorrect password' })
     .expect('Content-Type', /json/)
     .expect(401, done);
