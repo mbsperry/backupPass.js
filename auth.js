@@ -10,6 +10,8 @@ exports.check_key = function (req, res, next) {
   var logreq = req.ip + ': Decryption request';
   var logdata = 'Supplied key: ' + key;
 
+  debugger;
+
   // Try to decrypt each of the 5 key files
   for (var i = 0; i<5; i++) {
     cryptfile = config.key_prefix + 'key' + i + ".crypt";

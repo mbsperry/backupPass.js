@@ -21,7 +21,9 @@ var post = require('./post.js');
 
 // Load express
 var express = require('express');
-var session = require('cookie-session');
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+var memStore = new session.MemoryStore();
 
 var app = express();
 
@@ -48,14 +50,20 @@ var checkHTTPS = function (req, res, next) {
  */
 
 app.enable('trust proxy');
+app.use(bodyParser.urlencoded()); // support for URL-encoded bodies in posts
+app.use(cookieParser());
 app.use('/session', session({
-  keys: config.sessionKeys, 
-  SecureProxy: true,
-  httpOnly: true,
-  maxage: 300000
+  secret: "test",
+  key: 'sid',
+  store: memStore,
+  cookie: {
+    keys: config.sessionKeys, 
+    SecureProxy: true,
+    httpOnly: true,
+    maxage: 300000
+  }
 }));
 app.use('/session/secure', checkLoginKey);
-app.use(bodyParser.json()); // support for URL-encoded bodies in posts
 
 /* 
  *            Application Logic
@@ -149,6 +157,7 @@ var bad_login = function() {
 
 app.use(function(err, req, res, next) {
   console.log("Error handler received: " + err);
+  console.log(err.stack);
 
   // Not sure if I want to do this -- 
   // maybe allow people another chance at entering password 
