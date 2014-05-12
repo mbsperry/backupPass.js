@@ -24,6 +24,7 @@ var copyfile = function(file) {
 };
 
 var app;
+var agent;
 
 
 before(function(done) {
@@ -38,6 +39,7 @@ before(function(done) {
 
   // Must start app after lockfile has been deleted
   app = require('../app.js');
+  agent = request.agent(app);
 
   fs.readdir(basepath + '/data/keys', function(err, files) {
     files.forEach(copyfile);
@@ -54,9 +56,7 @@ before(function(done) {
 });
 
 describe('index', function() {
-  var agent; 
   it('should return 200', function(done) {
-    agent = request.agent(app);
     agent
     .get('/')
     .expect(200)
@@ -69,9 +69,7 @@ describe('index', function() {
 
 describe('authenticate with key', function() {
   var csrfToken;
-  var agent;
   beforeEach(function(done) {
-    agent = request.agent(app);
     agent
     .get('/session')
     .end(function(err, res) {
@@ -106,18 +104,39 @@ describe('authenticate with key', function() {
     .expect('Content-Type', /json/)
     .expect(401, done);
   });
+
+  it('should fail with an outdated csrf token', function(done) {
+    agent
+    .get('/session')
+    .end(function(err, res) {
+      agent
+      .post('/session/auth')
+      .send({ key: 'cde94152fe008cce8ce9d42b3964fc55c3eebbab2c9e3079af0f82735c4d0de0' })
+      .expect('Content-Type', /json/)
+      .expect(401, done);
+    });
+  });
 });
 
 describe('Authenticate with correct password', function() {
-  var agent;
   var csrfToken;
   
   before(function(done) {
-    agent = request.agent(app);
+    this.timeout(4000);
+    // Delete a lockfile if it exists
     try {
-      fs.unlinkSync(basepath + '/lockfile');
+      console.log("Deleting lockfile");
+      fs.unlinkSync(basepath + '/../lockfile');
     } catch (err) {
+      console.log("No lockfile");
     }
+
+    // Restart the server since it locked during last tests
+    // Must start app after lockfile has been deleted
+    console.log("Restarting...");
+    app.restart();
+    agent = request.agent(app);
+
     // Need to suppy a valid key before each password test
     copyfile('key0.crypt');
     var auth_with_key = function () {
@@ -178,11 +197,9 @@ describe('Authenticate with correct password', function() {
 });
 
 describe('Authenticate with incorrect password', function() {
-  var agent;
   var csrfToken;
 
   before(function(done) {
-    agent = request.agent(app);
     // Make sure to delete the lockfile if it exists
     try {
       fs.unlinkSync(basepath + '/lockfile');

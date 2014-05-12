@@ -230,4 +230,12 @@ try {
 
 }
 
+// Restart method for testing purposes
+server.restart = function() {
+  if (config.mode != 'production') {
+    lockout = false;
+    server.listen(8443);
+  }
+};
+
 module.exports = server;
