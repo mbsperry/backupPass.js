@@ -1,6 +1,7 @@
 var fs = require('fs');
 var crypto = require('crypto');
 var bodyParser = require('body-parser');
+var helmet = require('helmet');
 
 // Load config
 var config = require('./config.json');
@@ -43,6 +44,7 @@ var checkHTTPS = function (req, res, next) {
  */
 
 app.enable('trust proxy');
+app.use(helmet.defaults());
 app.use(bodyParser.json()); // support for URL-encoded bodies in posts
 app.use(cookieParser());
 
