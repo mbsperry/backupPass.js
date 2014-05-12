@@ -22,7 +22,7 @@ $(document).ready(function() {
   var send_ajax_post = function(url, data, success) {
     $.ajax({
       type: "POST",
-      //headers: {'X-CSRF-TOKEN': csrfToken},
+      headers: {'X-CSRF-TOKEN': csrfToken},
       url: url,
       contentType: 'application/json',
       data: JSON.stringify(data),
