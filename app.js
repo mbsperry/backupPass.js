@@ -183,7 +183,7 @@ var bad_login = function() {
 
 app.use(function(err, req, res, next) {
   console.log("Error handler received: " + err);
-  console.log(req.get('x-csrf-token'));
+  console.log(req.get('X-CSRF-TOKEN'));
   console.log(err.stack);
 
   // Not sure if I want to do this -- 
