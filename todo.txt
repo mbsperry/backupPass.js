@@ -28,6 +28,8 @@ Things to do
 [X] Basic error handling
 [ ] Differentiate login errors vs server errors
 [X] Need to use SESSIONS!
-[ ] Use Helmet.js
+[X] Use Helmet.js
 [X] Only use bodyParser.json
 [X] Encrypt cookie variables // by default
+[X] Use CSRF tokens
+[ ] Redo config setup -- not useful right now
