@@ -2,6 +2,7 @@ var fs = require('fs');
 var crypto = require('crypto');
 var bodyParser = require('body-parser');
 var helmet = require('helmet');
+var csrf = require('csurf');
 
 // Load config
 var config = require('./config.json');
@@ -73,6 +74,11 @@ app.use('/session', session({
   }
 }));
 app.use('/session/secure', checkLoginKey);
+app.use('/session', csrf());
+app.use('/session', function(req, res, next) {
+  res.set({'X-CSRF-TOKEN': req.csrfToken()});
+  next();
+});
 
 /* 
  *            Application Logic
@@ -137,6 +143,10 @@ app.post('/session/secure/show', show);
 // Show account list
 app.post('/session/secure/list', list);
 
+app.get('/session', function(req, res) {
+  res.send({'Token': req.csrfToken()});
+});
+
 // Check key
 app.post('/session/auth', auth);
 
@@ -145,13 +155,20 @@ app.post('/session/auth', auth);
  */
 
 var bad_login = function() {
+  var pauseLength;
   console.log("A bad login attempt");
   login_attempts += 1;
   login_pause = true;
 
+  if (config.mode == "production") {
+    pauseLength = 2000;
+  } else {
+    pauseLength = 0;
+  }
+
   setTimeout(function() {
     login_pause = false;
-  }, 2000);
+  }, pauseLength);
 
   if (login_attempts > 2) {
     lockout = true;
@@ -166,6 +183,7 @@ var bad_login = function() {
 
 app.use(function(err, req, res, next) {
   console.log("Error handler received: " + err);
+  console.log(req.get('x-csrf-token'));
   console.log(err.stack);
 
   // Not sure if I want to do this -- 

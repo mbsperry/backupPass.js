@@ -24,7 +24,6 @@ var copyfile = function(file) {
 };
 
 var app;
-var agent;
 
 
 before(function(done) {
@@ -39,7 +38,6 @@ before(function(done) {
 
   // Must start app after lockfile has been deleted
   app = require('../app.js');
-  agent = request.agent(app);
 
   fs.readdir(basepath + '/data/keys', function(err, files) {
     files.forEach(copyfile);
@@ -56,7 +54,9 @@ before(function(done) {
 });
 
 describe('index', function() {
+  var agent; 
   it('should return 200', function(done) {
+    agent = request.agent(app);
     agent
     .get('/')
     .expect(200)
@@ -68,9 +68,23 @@ describe('index', function() {
 });
 
 describe('authenticate with key', function() {
+  var csrfToken;
+  var agent;
+  beforeEach(function(done) {
+    agent = request.agent(app);
+    agent
+    .get('/session')
+    .end(function(err, res) {
+      csrfToken = res.body.Token;
+      agent.saveCookies(res);
+      done();
+    });
+  });
+
   it('should should return true', function(done) {
     agent
     .post('/session/auth')
+    .set('X-CSRF-TOKEN', csrfToken)
     .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
     .expect('Content-Type', /json/)
     .expect(200)
@@ -86,52 +100,58 @@ describe('authenticate with key', function() {
   });
 
   it('should return false with a repeated key', function(done) {
-    this.timeout(4000);
-    setTimeout(function() {
-      // Need to wait for the bad login timeout...
-      agent
-      .post('/session/auth')
-      .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
-      .expect('Content-Type', /json/)
-      .expect(401, done);
-    }, 2003);
+    agent
+    .post('/session/auth')
+    .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
+    .expect('Content-Type', /json/)
+    .expect(401, done);
   });
 });
 
 describe('Authenticate with correct password', function() {
-  this.timeout(4000);
+  var agent;
+  var csrfToken;
   
   before(function(done) {
-    var waitTime = 2003;
-    // Make sure to delete the lockfile if it exists
+    agent = request.agent(app);
     try {
       fs.unlinkSync(basepath + '/lockfile');
     } catch (err) {
     }
     // Need to suppy a valid key before each password test
-    setTimeout(function() {
-      // Make sure to wait through timeout from last bad login
-      copyfile('key0.crypt');
+    copyfile('key0.crypt');
+    var auth_with_key = function () {
       agent
       .post('/session/auth')
+      .set('X-CSRF-TOKEN', csrfToken)
       .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
       .end(function(err, res) {
+        csrfToken = res.header['x-csrf-token'];
         agent.saveCookies(res);
         done();
       });
-    }, waitTime);
-    waitTime = 0;
+    };
+
+    agent
+    .get('/session')
+    .end(function(err, res) {
+      csrfToken = res.body.Token;
+      agent.saveCookies(res);
+      auth_with_key();
+    });
   });
 
   it('Should return an array with a correct password', function(done) {
     agent
     .post('/session/secure/list')
+    .set('X-CSRF-TOKEN', csrfToken)
     .send({ pass: 'a test' })
     .expect('Content-Type', /json/)
     .expect(200)
     .end(function (err, res) {
       if (err) return done(err);
       agent.saveCookies(res);
+      csrfToken = res.header['x-csrf-token'];
       res.body.should.be.instanceof(Array);
       done();
     });
@@ -140,6 +160,7 @@ describe('Authenticate with correct password', function() {
   it('should return an account object when given an index', function(done) {
     agent
     .post('/session/secure/show')
+    .set('X-CSRF-TOKEN', csrfToken)
     .send({ index: 1})
     .expect('Content-Type', /json/)
     .expect(200)
@@ -157,8 +178,11 @@ describe('Authenticate with correct password', function() {
 });
 
 describe('Authenticate with incorrect password', function() {
+  var agent;
+  var csrfToken;
 
   before(function(done) {
+    agent = request.agent(app);
     // Make sure to delete the lockfile if it exists
     try {
       fs.unlinkSync(basepath + '/lockfile');
@@ -167,12 +191,24 @@ describe('Authenticate with incorrect password', function() {
     // Need to suppy a valid key before each password test
     // Make sure to wait through timeout from last bad login
     copyfile('key0.crypt');
+    var auth_with_key = function () {
+      agent
+      .post('/session/auth')
+      .set('X-CSRF-TOKEN', csrfToken)
+      .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
+      .end(function(err, res) {
+        csrfToken = res.header['x-csrf-token'];
+        agent.saveCookies(res);
+        done();
+      });
+    };
+
     agent
-    .post('/session/auth')
-    .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
+    .get('/session')
     .end(function(err, res) {
+      csrfToken = res.body.Token;
       agent.saveCookies(res);
-      done();
+      auth_with_key();
     });
   });
 
