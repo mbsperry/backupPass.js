@@ -21,5 +21,8 @@
     "supertest": "0.12.x",
     "should": "3.3.x"
   },
-  "engine": "node >= 0.10.21"
+  "engine": "node >= 0.10.21",
+  "scripts": {
+    "test": "mocha"
+  }
 }
