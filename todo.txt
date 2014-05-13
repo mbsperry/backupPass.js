@@ -5,7 +5,7 @@ Things to do
 [X] One-time passwords
 [X] 2 second time out between attempts
 [X] Shutdown server after 3 fails
-[ ] Delete kdbx, all encrypted keyfiles after 5 fails
+[i] Delete kdbx, all encrypted keyfiles after 5 fails
 [-] Display image that was encrypted with pswd and md5 hash
 [ ] Display verifcation image or phrase
 [X] Decrypt key file and save to temporary file
@@ -21,7 +21,6 @@ Things to do
 [-] Purge kdbx from memory // I don't think I need to do this
 [X] Write README
 [X] rename make_keys.js --> setup.js
-[ ] Add 'initial' option to setup.js
 [ ] ?Only add '/keepass' to git repo on setup?
 [X] Add lockfile -- set lock to lock server, stop auto restart
 [ ] Email when server locks
@@ -32,4 +31,4 @@ Things to do
 [X] Only use bodyParser.json
 [X] Encrypt cookie variables // by default
 [X] Use CSRF tokens
-[ ] Redo config setup -- not useful right now
+[X] Redo config setup -- not useful right now
