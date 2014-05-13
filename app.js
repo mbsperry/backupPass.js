@@ -154,9 +154,8 @@ app.post('/session/auth', auth);
  *      Error handling
  */
 
-var bad_login = function() {
+var bad_login = function(next) {
   var pauseLength;
-  console.log("A bad login attempt");
   login_attempts += 1;
   login_pause = true;
 
@@ -172,19 +171,24 @@ var bad_login = function() {
 
   if (login_attempts > 2) {
     lockout = true;
-    server.close();
+    //server.close();
     fs.writeFile('./lockfile', 'Server locked', function write(err) {
       if (err) 
         throw err;
+    });
+    console.log("Deleting all key files");
+    fs.readdir(config.key_prefix, function(err, files) {
+      if (err) throw err;
+      files.forEach(function (file) {
+        fs.unlink(config.key_prefix + file, function() { if (err) throw err; });
+      });
     });
     logger.log('Server locked');
   }
 };
 
 app.use(function(err, req, res, next) {
-  console.log("Error handler received: " + err);
-  console.log(req.get('X-CSRF-TOKEN'));
-  console.log(err.stack);
+  console.error("Error handler received: " + err);
 
   // Not sure if I want to do this -- 
   // maybe allow people another chance at entering password 
@@ -235,6 +239,7 @@ server.restart = function() {
   if (config.mode != 'production') {
     lockout = false;
     server.listen(8443);
+    console.log("Server restarted");
   }
 };
 

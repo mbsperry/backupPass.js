@@ -23,7 +23,6 @@ module.exports = function (req, res, next) {
     var test_key = my_crypto.decrypt_phrase(key, cryptfile);
     if (test_key) {
       req.session.clear_key = test_key;
-      console.log(req.session.clear_key);
       break;
     }
     else {
@@ -42,7 +41,6 @@ module.exports = function (req, res, next) {
         if (err) {
           throw err;
         }
-        console.log("Deleted: " + cryptfile);
       });
     }
     req.session.login = true;
