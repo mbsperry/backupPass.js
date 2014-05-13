@@ -114,6 +114,8 @@ app.all('*', function(req, res, next) {
     } else {
       next();
     }
+  } else {
+    res.status(404).send({ error: 'Not found' } );
   }
 });
 
@@ -156,17 +158,9 @@ app.post('/session/auth', auth);
 
 var bad_login = function(next) {
   var pauseLength;
-  var key_prefix;
+  var key_prefix = config.key_prefix;
   login_attempts += 1;
   login_pause = true;
-
-  if (config.mode == "production") {
-    pauseLength = 2000;
-    key_prefix = './keys/';
-  } else {
-    pauseLength = 0;
-    key_prefix = './testing/';
-  }
 
   setTimeout(function() {
     login_pause = false;
@@ -180,12 +174,23 @@ var bad_login = function(next) {
         throw err;
     });
     console.log("Deleting all key files");
-    fs.readdir(key_prefix, function(err, files) {
+
+    var deleteKeyFiles = function(err, files) {
       if (err) throw err;
       files.forEach(function (file) {
         fs.unlink(key_prefix + file, function() { if (err) throw err; });
       });
-    });
+      deleteKDBX();
+    };
+
+    var deleteKDBX = function() {
+      console.log("Deleting KDBX: " + config.keepass_path);
+      fs.unlink(config.keepass_path, function(err) {
+        if (err) throw err;
+      });
+    };
+
+    fs.readdir(key_prefix, deleteKeyFiles);
     logger.log('Server locked');
   }
 };

@@ -9,6 +9,7 @@ var getToken = require('./getToken');
 
 //request = request('http://localhost:8000');
 process.env.NODE_ENV = 'test';
+process.env.KEEPASS_PATH = './keepass/testing.kdbx';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 
@@ -33,10 +34,8 @@ before(function(done) {
   this.timeout(4000);
   // Delete a lockfile if it exists
   try {
-    console.log("Deleting lockfile");
     fs.unlinkSync(basepath + '/../lockfile');
   } catch (err) {
-    console.log("No lockfile");
   }
 
   // Must start app after lockfile has been deleted
@@ -179,7 +178,6 @@ describe('authenticate with invalid key', function() {
       var path = basepath + '/../testing/';
       var getFiles = function() {
         fs.readdir(path, function(err, files) {
-          console.log(files);
           files.length.should.equal(0);
           done();
         });
@@ -193,6 +191,7 @@ describe('authenticate with invalid key', function() {
     var path = basepath + '/../keepass/testing.kdbx';
     fs.exists(path, function(exists) {
       exists.should.equal(false);
+      done();
     });
   });
 
@@ -209,9 +208,17 @@ describe('Authenticate with incorrect password', function() {
     } catch (err) {
     }
 
+    // Need to replace testing.kdbx file
+    try {
+      fs.writeFileSync(basepath + '/../keepass/testing.kdbx', fs.readFileSync(basepath + '/data/testing.kdbx'));
+    } catch (err) {
+      throw err;
+    }
+
     // Restart server since it locked during the last tests...
     console.log("Restarting server...");
     app.restart();
+    failAgent = request.agent(app);
 
     // Need to suppy a valid key before each password test
     // Make sure to wait through timeout from last bad login
@@ -235,6 +242,7 @@ describe('Authenticate with incorrect password', function() {
   it('Should return an 401 with an incorrect password', function(done) {
     failAgent
     .post('/session/secure/list')
+    .set('X-CSRF-TOKEN', csrfToken)
     .send({ pass: 'incorrect password' })
     .expect('Content-Type', /json/)
     .expect(401, done);
@@ -245,7 +253,8 @@ describe('Authenticate with incorrect password', function() {
 after(function(done) {
   var testdb = basepath + '/../keepass/testing.kdbx';
   fs.unlink(testdb, function(err) {
-    if (err) throw err;
+    // Don't throw an error if file doesn't exist
+    if (err.code != 'ENOENT') throw err;
     done();
   });
 });

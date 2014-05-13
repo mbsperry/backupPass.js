@@ -5,13 +5,12 @@ Things to do
 [X] One-time passwords
 [X] 2 second time out between attempts
 [X] Shutdown server after 3 fails
-[i] Delete kdbx, all encrypted keyfiles after 5 fails
-[-] Display image that was encrypted with pswd and md5 hash
+[X] Delete kdbx, all encrypted keyfiles after 5 fails
 [ ] Display verifcation image or phrase
 [X] Decrypt key file and save to temporary file
 [X] See node-tmp
 [X] Get kdbx password
-[ ] Same things -- after 5 tries delete everything
+[X] Same things -- after 5 tries delete everything
 [X] Load kdbx
 [X] Log KDBX unlock attempts
 [X] Show list of Accounts
@@ -21,7 +20,6 @@ Things to do
 [-] Purge kdbx from memory // I don't think I need to do this
 [X] Write README
 [X] rename make_keys.js --> setup.js
-[ ] ?Only add '/keepass' to git repo on setup?
 [X] Add lockfile -- set lock to lock server, stop auto restart
 [ ] Email when server locks
 [X] Basic error handling
@@ -32,3 +30,4 @@ Things to do
 [X] Encrypt cookie variables // by default
 [X] Use CSRF tokens
 [X] Redo config setup -- not useful right now
+[ ] Delete keepass.kdbx from repo
