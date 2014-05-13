@@ -8,7 +8,7 @@ var fs = require('fs');
 var config = require('../config.json');
 
 module.exports = function (req, res, next) {
-  var cryptfile = "";
+  var cryptfile;
   var key = req.body.key;
 
   var logreq = req.ip + ': Decryption request';
@@ -16,39 +16,43 @@ module.exports = function (req, res, next) {
 
 
   // Try to decrypt each of the 5 key files
-  for (var i = 0; i<5; i++) {
-    cryptfile = config.key_prefix + 'key' + i + ".crypt";
+  fs.readdir(config.key_prefix, function(err, files) {
+    files.some(function(file) {
+      debugger;
 
-    // false if decyption fails
-    var test_key = my_crypto.decrypt_phrase(key, cryptfile);
-    if (test_key) {
-      req.session.clear_key = test_key;
-      break;
+      // false if decyption fails
+      var test_key = my_crypto.decrypt_phrase(key, config.key_prefix + file);
+      if (test_key) {
+        cryptfile = config.key_prefix + file;
+        req.session.clear_key = test_key;
+        return true;
+      }
+      else {
+        // Must set this explicitly to avoid memory
+        req.session.clear_key = false;
+        return false;
+      }
+    });
+
+    // Was the key properly decrypted?
+    if (req.session.clear_key) {
+      logdata += '\n***Decryption success***';
+      log.log(logreq, logdata);
+
+      if (config.delete_key_files === true) {
+        fs.unlink(cryptfile, function (err) {
+          if (err) {
+            throw err;
+          }
+        });
+      }
+      req.session.login = true;
+      res.send({ response: true });
     }
     else {
-      // Must set this explicitly to avoid memory
-      req.session.clear_key = false;
+      logdata += '\nDecryption failed';
+      log.log(logreq, logdata);
+      next(new Error("bad_login"));
     }
-  }
-
-  // Was the key properly decrypted?
-  if (req.session.clear_key) {
-    logdata += '\n***Decryption success***';
-    log.log(logreq, logdata);
-
-    if (config.delete_key_files === true) {
-      fs.unlink(cryptfile, function (err) {
-        if (err) {
-          throw err;
-        }
-      });
-    }
-    req.session.login = true;
-    res.send({ response: true });
-  }
-  else {
-    logdata += '\nDecryption failed';
-    log.log(logreq, logdata);
-    next(new Error("bad_login"));
-  }
+  });
 };
