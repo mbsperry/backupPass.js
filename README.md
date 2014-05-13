@@ -50,10 +50,6 @@ Development dependencies:
 
 ## Setup
 
-```bash
-node setup.js initial
-```
-
 - Copy keepass database to `./keepass.`
 - Copy keepass database key file to `./do_not_include`
 - Build backup.pass keys:
