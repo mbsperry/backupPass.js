@@ -7,6 +7,9 @@ var csrf = require('csurf');
 // Load logger
 var logger = require('./lib/log');
 
+// Load config options
+var config = require('./lib/config');
+
 // Load application routes
 var auth = require('./routes/auth.js');
 var list = require('./routes/list.js');
@@ -100,11 +103,11 @@ var server;
 // x-forwarded-proto is a heroku specific header
 app.all('*', function(req, res, next) {
   if (lockout === false && login_pause === false) {
-    if (process.env.NODE_ENV == "production") {
+    if (config.mode == "production") {
       if (req.headers['x-forwarded-proto']=='https') {
         next();
       } else {
-        if (process.env.BP_REDIRECT === true) {
+        if (config.redirect === true) {
           res.redirect('https://' + req.host);
         }
       }
@@ -157,7 +160,7 @@ var bad_login = function(next) {
   login_attempts += 1;
   login_pause = true;
 
-  if (process.env.NODE_ENV == "production") {
+  if (config.mode == "production") {
     pauseLength = 2000;
     key_prefix = './keys/';
   } else {
@@ -213,7 +216,7 @@ try {
 } catch (err) {
   // Only start the server if the file doesn't exist
 
-  if (process.env.NODE_ENV == "production")
+  if (config.mode == "production")
   {
     // Trust heroku's forwarding -- note that this can be spoofed easily
 
@@ -236,7 +239,7 @@ try {
 
 // Restart method for testing purposes
 server.restart = function() {
-  if (process.env.NODE_ENV != 'production') {
+  if (config.mode != 'production') {
     lockout = false;
     server.listen(8443);
     console.log("Server restarted");

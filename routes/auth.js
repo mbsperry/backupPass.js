@@ -3,23 +3,17 @@
  */
 
 var log = require('../lib/log');
+var config = require('../lib/config');
 var my_crypto = require('../lib/my_crypto');
 var fs = require('fs');
 
 module.exports = function (req, res, next) {
   var cryptfile;
-  var key_prefix;
+  var key_prefix = config.key_prefix;
   var key = req.body.key;
 
   var logreq = req.ip + ': Decryption request';
   var logdata = 'Supplied key: ' + key;
-
-  if (process.env.NODE_ENV == 'production') {
-    key_prefix = './keys/';
-  } else {
-    key_prefix = './testing/';
-  }
-
 
   // Try to decrypt each of the 5 key files
   fs.readdir(key_prefix, function(err, files) {

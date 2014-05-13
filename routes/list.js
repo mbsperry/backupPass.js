@@ -6,22 +6,15 @@ var fs = require('fs');
 var kp = require('../lib/kp_functions');
 var write_tmp_file = require('../lib/write_tmp_file');
 var logger = require('../lib/log');
+var config = require('../lib/config');
 
 /*
  * Generates the list of KeePass accounts
  */
 
 var list_accts = function(req, key, keyfile, next) {
-  var keydb;
+  var keydb = config.keepass_path;
 
-  if (process.env.NODE_ENV == 'test') {
-    keydb = './keepass/testing.kdbx';
-  } else if (process.env.KEEPASS_PATH) {
-    keydb = process.env.KEEPASS_PATH;
-  } else {
-    keydb = './keepass/keepass.kdbx';
-  }
-  
   var make_acct_list = function(err, accts) {
     var acctNames = [];
     if (err) {
