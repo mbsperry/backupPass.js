@@ -50,8 +50,8 @@ Development dependencies:
 
 ## Setup
 
-- Copy keepass database to `./keepass.`
-- Copy keepass database key file to `./do_not_include`
+- Copy keepass database to `./keepass/keepass.kdbx`
+- Copy keepass database key file to `./do_not_include/key.key`
 - Build backup.pass keys:
 
 ```bash
@@ -62,11 +62,13 @@ node setup.js production
 
 ## Run
 
+
 ```bash
 node app.js
 ```
 
-Or deploy to your favorite PaaS.
+- Requires running behind https capable proxy.
+- Or deploy to your favorite PaaS.
 
 ## Options
 
