@@ -4,9 +4,6 @@ var bodyParser = require('body-parser');
 var helmet = require('helmet');
 var csrf = require('csurf');
 
-// Load config
-var config = require('./config.json');
-
 // Load logger
 var logger = require('./lib/log');
 
@@ -107,7 +104,7 @@ app.all('*', function(req, res, next) {
       if (req.headers['x-forwarded-proto']=='https') {
         next();
       } else {
-        if (config.redirect === true) {
+        if (process.env.BP_REDIRECT === true) {
           res.redirect('https://' + req.host);
         }
       }
@@ -156,13 +153,16 @@ app.post('/session/auth', auth);
 
 var bad_login = function(next) {
   var pauseLength;
+  var key_prefix;
   login_attempts += 1;
   login_pause = true;
 
-  if (config.mode == "production") {
+  if (process.env.NODE_ENV == "production") {
     pauseLength = 2000;
+    key_prefix = './keys/';
   } else {
     pauseLength = 0;
+    key_prefix = './testing/';
   }
 
   setTimeout(function() {
@@ -177,10 +177,10 @@ var bad_login = function(next) {
         throw err;
     });
     console.log("Deleting all key files");
-    fs.readdir(config.key_prefix, function(err, files) {
+    fs.readdir(key_prefix, function(err, files) {
       if (err) throw err;
       files.forEach(function (file) {
-        fs.unlink(config.key_prefix + file, function() { if (err) throw err; });
+        fs.unlink(key_prefix + file, function() { if (err) throw err; });
       });
     });
     logger.log('Server locked');
@@ -213,7 +213,7 @@ try {
 } catch (err) {
   // Only start the server if the file doesn't exist
 
-  if (config.mode == "production")
+  if (process.env.NODE_ENV == "production")
   {
     // Trust heroku's forwarding -- note that this can be spoofed easily
 
@@ -236,7 +236,7 @@ try {
 
 // Restart method for testing purposes
 server.restart = function() {
-  if (config.mode != 'production') {
+  if (process.env.NODE_ENV != 'production') {
     lockout = false;
     server.listen(8443);
     console.log("Server restarted");

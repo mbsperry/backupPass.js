@@ -21,19 +21,32 @@ backup.pass is not meant to be used on a regular basis.
 - Five one-time use encryption keys are generated on setup.
 - Each key is used to encrypt a separate copy of the KeePass
 encryption key file. 
-- Everytime a key is used, it is deleted.
+- Every time a key is used, it is deleted.
 - Once the KeePass database key file is decrypted, the user still must
 supply the KeePass password to unlock the database.
-- After 3 incorrect attempts the server shuts down.
+- After 3 incorrect attempts: 
+   - The server shuts down.
+   - All remaining keyfiles are deleted.
+- Unencrypted Keepass database keys are not stored on the server.
+- The Keepass password is never stored in any form.
+
 
 ## Dependencies
-
-Minimal dependencies
 
 - Express
 - KeePass.io
 - body-parser
 - node-tmp
+- cookierParser
+- express-session
+- helmet
+- csurf
+
+Development dependencies:
+
+- mocha
+- should
+- supertest
 
 ## Setup
 
@@ -51,6 +64,24 @@ node setup.js production
 
 - **Print and keep the one-time keys with you.** They won't do you any good unless you have them when you need them!
 
-## Deploy
+## Run
 
-- Currently optimized for heroku, but should be easy to migrate to other services
+```bash
+node app.js
+```
+
+Or deploy to your favorite PaaS.
+
+## Options
+
+Stored as env variables
+
+- `NODE_ENV = 'production'`
+    - Stores encrypted keyfiles in `./keys/`
+    - Expects to run behind a proxy. 
+- `NODE_ENV = 'test'`
+    - Stores encrypted keyfiles in `./testing/`
+    - Starts self-signed https server
+    - loads keepass database from `./keepass/testing.kdbx`
+- `KEEPASS_PATH`
+    - Specifies alternate path for keepass database
