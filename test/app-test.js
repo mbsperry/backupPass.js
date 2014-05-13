@@ -9,7 +9,7 @@ var getToken = require('./getToken');
 
 //request = request('http://localhost:8000');
 process.env.NODE_ENV = 'test';
-process.env.KEEPASS_PATH = './keepass/testing.kdbx';
+process.env.KEEPASS_PATH = './testing_db.kdbx';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 
@@ -47,7 +47,7 @@ before(function(done) {
     files.forEach(copyfile);
 
     try {
-      fs.writeFileSync(basepath + '/../keepass/testing.kdbx', fs.readFileSync(basepath + '/data/testing.kdbx'));
+      fs.writeFileSync(basepath + '/../testing_db.kdbx', fs.readFileSync(basepath + '/data/testing_db.kdbx'));
     done();
     } catch (err) {
       throw err;
@@ -188,7 +188,7 @@ describe('authenticate with invalid key', function() {
   });
 
   it('should delete kdbx database after three failed logins', function(done) {
-    var path = basepath + '/../keepass/testing.kdbx';
+    var path = basepath + '/../testing_db.kdbx';
     fs.exists(path, function(exists) {
       exists.should.equal(false);
       done();
@@ -210,7 +210,7 @@ describe('Authenticate with incorrect password', function() {
 
     // Need to replace testing.kdbx file
     try {
-      fs.writeFileSync(basepath + '/../keepass/testing.kdbx', fs.readFileSync(basepath + '/data/testing.kdbx'));
+      fs.writeFileSync(basepath + '/../testing_db.kdbx', fs.readFileSync(basepath + '/data/testing_db.kdbx'));
     } catch (err) {
       throw err;
     }
@@ -251,7 +251,7 @@ describe('Authenticate with incorrect password', function() {
 });
 
 after(function(done) {
-  var testdb = basepath + '/../keepass/testing.kdbx';
+  var testdb = basepath + '/../testing_db.kdbx';
   fs.unlink(testdb, function(err) {
     // Don't throw an error if file doesn't exist
     if (err.code != 'ENOENT') throw err;
