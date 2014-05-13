@@ -6,7 +6,6 @@ Things to do
 [X] 2 second time out between attempts
 [X] Shutdown server after 3 fails
 [X] Delete kdbx, all encrypted keyfiles after 5 fails
-[ ] Display verifcation image or phrase
 [X] Decrypt key file and save to temporary file
 [X] See node-tmp
 [X] Get kdbx password
@@ -30,4 +29,4 @@ Things to do
 [X] Encrypt cookie variables // by default
 [X] Use CSRF tokens
 [X] Redo config setup -- not useful right now
-[ ] Delete keepass.kdbx from repo
+[X] Delete keepass.kdbx from repo
