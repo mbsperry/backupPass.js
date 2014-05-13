@@ -1,11 +1,9 @@
-test.js
-setup
-keepass/key.key
 sslcert
 do_not_include
 testing
 log.txt
 lockfile
+config.json
 
 
 lib-cov
