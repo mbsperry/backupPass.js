@@ -21,6 +21,7 @@ var cookieParser = require('cookie-parser');
 var session = require('express-session');
 
 var app = express();
+var use_secure_cookies;
 
 /*            
  *            Define middleware
@@ -36,8 +37,6 @@ var checkLoginKey = function (req, res, next) {
   }
 };
 
-var checkHTTPS = function (req, res, next) {
-};
 
 
 /*
@@ -62,13 +61,20 @@ try {
   throw err;
 }
 
+
+if (config.mode == 'production') {
+  use_secure_cookies = true;
+} else {
+  use_secure_cookies = false;
+}
+
 app.use('/session', session({
   secret: sessKey,
   key: 'session.sid',
   store: memStore,
   proxy: true,
   cookie: {
-    secure: true,
+    secure: use_secure_cookies,
     httpOnly: true,
     maxage: 300000
   }
@@ -230,14 +236,8 @@ try {
   }
   else
   {
-    // This is for testing locally
-    var https = require('https');
-    var privateKey  = fs.readFileSync('sslcert/backup_pass-key.pem');
-    var certificate = fs.readFileSync('sslcert/public-cert.pem');
-    var credentials = {key: privateKey, cert: certificate};
-    var httpsServer = https.createServer(credentials, app);
-    server = httpsServer.listen(8443);
-    console.log("Server started");
+    server = app.listen(3000);
+    console.log("App server started");
   }
 
 }
