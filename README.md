@@ -3,6 +3,8 @@ backup.pass
 
 A simple personal KeePass backup web server built with node.js
 
+[![Build Status](https://travis-ci.org/mbsperry/backupPass.js.svg?branch=master)](https://travis-ci.org/mbsperry/backupPass.js)
+
 ## About
 
 backup.pass aims to supply a little peace of mind to those of use
