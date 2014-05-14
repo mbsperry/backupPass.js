@@ -139,6 +139,15 @@ describe('authenticate with valid key', function() {
 });
 
 describe('authenticate with invalid key', function() {
+  var csrfToken;
+
+  before(function(done) {
+    var setToken = function(err, token) {
+      csrfToken = token;
+      done();
+    };
+    getToken(failAgent, setToken);
+  });
 
   it('should return 401 with invalid key', function(done) {
     var useValidKey = function(err, csrfToken) {
@@ -180,6 +189,7 @@ describe('authenticate with invalid key', function() {
     // One more bad login required first
     failAgent
     .post('/session/auth')
+    .set('X-CSRF-TOKEN', csrfToken)
     .send({ key: 'invalid key' })
     .end(function() {
       var path = basepath + '/../testing/';

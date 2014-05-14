@@ -14,9 +14,7 @@ Things to do
 [X] Log KDBX unlock attempts
 [X] Show list of Accounts
 [X] Show password for selected account
-[-] Close connection // I don't think this is necessary
 [X] Delete encrypted keyfile
-[-] Purge kdbx from memory // I don't think I need to do this
 [X] Write README
 [X] rename make_keys.js --> setup.js
 [X] Add lockfile -- set lock to lock server, stop auto restart

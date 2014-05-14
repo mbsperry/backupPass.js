@@ -7,6 +7,7 @@ var kp = require('../lib/kp_functions');
 var write_tmp_file = require('../lib/write_tmp_file');
 var logger = require('../lib/log');
 var config = require('../lib/config');
+var errors = require('../lib/error');
 
 /*
  * Generates the list of KeePass accounts
@@ -19,7 +20,7 @@ var list_accts = function(req, key, keyfile, next) {
     var acctNames = [];
     if (err) {
       logger.log("KDBX unlock failed");
-      return next(new Error("bad_login"));
+      return next(new errors.badLoginError("bad_login"));
     }
     else {
       accts.forEach(function(entry) {
@@ -29,7 +30,7 @@ var list_accts = function(req, key, keyfile, next) {
     }
     fs.unlink(keyfile, function (err) {
       if (err) {
-        throw err;
+        return next(err);
       }
       console.log("Deleted: " + keyfile);
     });

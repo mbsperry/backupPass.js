@@ -10,6 +10,9 @@ var logger = require('./lib/log');
 // Load config options
 var config = require('./lib/config');
 
+// Load custom error
+var errors = require('./lib/config');
+
 // Load application routes
 var auth = require('./routes/auth.js');
 var list = require('./routes/list.js');
@@ -22,6 +25,12 @@ var session = require('express-session');
 
 var app = express();
 var use_secure_cookies;
+var sessKey;
+
+// This is designed to be a single use web server. It should only be handling
+// a single session at any time, so I think it is acceptable to use MemoryStore in
+// this case, even though it does not scale.
+var memStore = new session.MemoryStore();
 
 /*            
  *            Define middleware
@@ -33,7 +42,7 @@ var checkLoginKey = function (req, res, next) {
     next();
   } else {
     console.log("Invalid login session");
-    res.send("Error: invalid session");
+    next(new errors.invalidSessionError("Error: invalid session"));
   }
 };
 
@@ -43,20 +52,15 @@ var checkLoginKey = function (req, res, next) {
  *          Setup middleware
  */
 
-app.enable('trust proxy');
 app.use(helmet.defaults());
 app.use(bodyParser.json()); // support for URL-encoded bodies in posts
 app.use(cookieParser());
 
-// This is designed to be a single use web server. It should only be handling
-// a single session at any time, so I think it is acceptable to use MemoryStore in
-// this case, even though it does not scale.
-var memStore = new session.MemoryStore();
 
 // Use a randomly generated session key. Persistence is not important in
 // this application.
 try {
-  var sessKey = crypto.randomBytes(32).toString('hex');
+  sessKey = crypto.randomBytes(32).toString('hex');
 } catch (err) {
   throw err;
 }
@@ -79,12 +83,16 @@ app.use('/session', session({
     maxage: 300000
   }
 }));
-app.use('/session/secure', checkLoginKey);
+
 app.use('/session', csrf());
+
+// Insert a CSRF token into outgoing headers
 app.use('/session', function(req, res, next) {
   res.set({'X-CSRF-TOKEN': req.csrfToken()});
   next();
 });
+
+app.use('/session/secure', checkLoginKey);
 
 /* 
  *            Application Logic
@@ -105,8 +113,8 @@ var server;
  *
  */
 
-// If we're in production mode, only accept https requests
-// x-forwarded-proto is a heroku specific header
+// If production mode, check to make sure the proxy protocol
+// header is https.
 app.all('*', function(req, res, next) {
   if (lockout === false && login_pause === false) {
     if (config.mode == "production") {
@@ -151,6 +159,7 @@ app.post('/session/secure/show', show);
 // Show account list
 app.post('/session/secure/list', list);
 
+// Send a CSRF token
 app.get('/session', function(req, res) {
   res.send({'Token': req.csrfToken()});
 });
@@ -203,14 +212,18 @@ var bad_login = function(next) {
 
 app.use(function(err, req, res, next) {
   console.error("Error handler received: " + err);
+  if (err.name == "BAD_LOGIN") {
+    // Not sure if I want to do this -- 
+    // maybe allow people another chance at entering password 
+    // before destroying the session?
+    req.session = null;
 
-  // Not sure if I want to do this -- 
-  // maybe allow people another chance at entering password 
-  // before destroying the session?
-  req.session = null;
-
-  res.status(401).send({ error: 'Error: Invalid credentials' } );
-  bad_login();
+    res.status(401).send({ error: 'Error: Invalid credentials' } );
+    bad_login();
+  } else {
+    res.status(500).send("Internal Server Error");
+    server.close();
+  }
 });
 
 
@@ -229,7 +242,8 @@ try {
 
   if (config.mode == "production")
   {
-    // Trust heroku's forwarding -- note that this can be spoofed easily
+    // Trust proxy headers-- note that this can be spoofed easily
+    app.enable('trust proxy');
 
     server = app.listen(process.env.PORT || 5000);
     console.log("Server started");
@@ -251,4 +265,5 @@ server.restart = function() {
   }
 };
 
+// For testing with supertest
 module.exports = server;

@@ -6,6 +6,7 @@ var log = require('../lib/log');
 var config = require('../lib/config');
 var my_crypto = require('../lib/my_crypto');
 var fs = require('fs');
+var errors = require('../lib/error');
 
 module.exports = function (req, res, next) {
   var cryptfile;
@@ -17,6 +18,7 @@ module.exports = function (req, res, next) {
 
   // Try to decrypt each of the 5 key files
   fs.readdir(key_prefix, function(err, files) {
+    if (err) return next(err);
     files.some(function(file) {
 
       // false if decyption fails
@@ -39,9 +41,7 @@ module.exports = function (req, res, next) {
       log.log(logreq, logdata);
 
       fs.unlink(cryptfile, function (err) {
-        if (err) {
-          throw err;
-        }
+        if (err) return next(err);
       });
 
       req.session.login = true;
@@ -50,7 +50,7 @@ module.exports = function (req, res, next) {
     else {
       logdata += '\nDecryption failed';
       log.log(logreq, logdata);
-      next(new Error("bad_login"));
+      next(new errors.badLoginError("bad_login"));
     }
   });
 };
