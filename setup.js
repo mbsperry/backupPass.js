@@ -63,6 +63,14 @@ fs.unlink('./lockfile', function (err) {
   }
 });
 
+// Make keys directory
+try {
+  fs.mkdirSync('./keys');
+} catch (err) {
+  if (err.code != "EEXIST") throw err;
+}
+
+
 get_keys(function () {
   // Make 5 different crypt files
   // Each file is the KDBX keyfile encrypted with one of the new random keys

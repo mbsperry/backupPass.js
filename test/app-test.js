@@ -43,6 +43,13 @@ before(function(done) {
   successAgent = request.agent(app);
   failAgent = request.agent(app);
 
+  // Make the ./testing directory if it doesn't exist
+  try {
+    fs.mkdirSync(basepath + '/../testing');
+  } catch (err) {
+    if (err.code != "EEXIST") throw err;
+  }
+
   fs.readdir(basepath + '/data/keys', function(err, files) {
     files.forEach(copyfile);
 
