@@ -218,6 +218,7 @@ app.use(function(err, req, res, next) {
     res.status(403).send({ error: 'Invalid session'});
   }else {
     res.status(500).send("Internal server error");
+    server.close();
   }
 });
 

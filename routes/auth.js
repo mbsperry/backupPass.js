@@ -40,7 +40,7 @@ module.exports = function (req, res, next) {
 
       fs.unlink(cryptfile, function (err) {
         if (err) {
-          throw err;
+          return next(err);
         }
       });
 

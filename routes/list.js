@@ -29,13 +29,13 @@ var list_accts = function(req, key, keyfile, next) {
     }
     fs.unlink(keyfile, function (err) {
       if (err) {
-        throw err;
+        return next(err);
       }
       console.log("Deleted: " + keyfile);
     });
 
     req.session.accts = accts;
-    next(null, acctNames);
+    return next(null, acctNames);
   };
 
   kp.get_accts(keydb, key, keyfile, make_acct_list);
