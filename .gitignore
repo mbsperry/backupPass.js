@@ -4,6 +4,7 @@ testing
 log.txt
 lockfile
 config.json
+*.kdbx
 
 
 lib-cov
