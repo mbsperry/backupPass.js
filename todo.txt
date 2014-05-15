@@ -22,7 +22,7 @@ Things to do
 [X] Add lockfile -- set lock to lock server, stop auto restart
 [ ] Email when server locks
 [X] Basic error handling
-[ ] Differentiate login errors vs server errors
+[X] Differentiate login errors vs server errors
 [X] Need to use SESSIONS!
 [X] Use Helmet.js
 [X] Only use bodyParser.json
