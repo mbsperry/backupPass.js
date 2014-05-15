@@ -139,27 +139,31 @@ describe('authenticate with valid key', function() {
 });
 
 describe('authenticate with invalid key', function() {
+  var csrfToken;
+
+  before(function(done) {
+    var setToken = function(err, token) {
+      csrfToken = token;
+      done();
+    };
+    getToken(failAgent, setToken);
+  });
+
 
   it('should return 401 with invalid key', function(done) {
-    var useValidKey = function(err, csrfToken) {
-      failAgent
-      .post('/session/auth')
-      .set('X-CSRF-TOKEN', csrfToken)
-      .send({ key: 'incorrect key' })
-      .expect(401, done);
-      };
-    getToken(failAgent, useValidKey);
+    failAgent
+    .post('/session/auth')
+    .set('X-CSRF-TOKEN', csrfToken)
+    .send({ key: 'incorrect key' })
+    .expect(401, done);
   });
 
   it('should return false with a repeated key', function(done) {
-    var useValidKey = function(err, csrfToken) {
-      failAgent
-      .post('/session/auth')
-      .set('X-CSRF-TOKEN', csrfToken)
-      .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
-      .expect(401, done);
-      };
-    getToken(failAgent, useValidKey);
+    failAgent
+    .post('/session/auth')
+    .set('X-CSRF-TOKEN', csrfToken)
+    .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
+    .expect(401, done);
   });
 
   // Not currently working -- not sure how csurf outdates tokens
@@ -180,6 +184,7 @@ describe('authenticate with invalid key', function() {
     // One more bad login required first
     failAgent
     .post('/session/auth')
+      .set('X-CSRF-TOKEN', csrfToken)
     .send({ key: 'invalid key' })
     .end(function() {
       var path = basepath + '/../testing/';

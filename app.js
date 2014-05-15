@@ -203,14 +203,20 @@ var bad_login = function(next) {
 
 app.use(function(err, req, res, next) {
   console.error("Error handler received: " + err);
+  if (err.message == 'BAD_LOGIN') {
+    console.log("Got a bad login error");
+    console.log(err.code);
 
-  // Not sure if I want to do this -- 
-  // maybe allow people another chance at entering password 
-  // before destroying the session?
-  req.session = null;
+    // Not sure if I want to do this -- 
+    // maybe allow people another chance at entering password 
+    // before destroying the session?
+    req.session = null;
 
-  res.status(401).send({ error: 'Error: Invalid credentials' } );
-  bad_login();
+    res.status(401).send({ error: 'Error: Invalid credentials' } );
+    bad_login();
+  } else {
+    res.status(500).send("Internal server error");
+  }
 });
 
 

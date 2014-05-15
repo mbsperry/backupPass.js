@@ -50,7 +50,7 @@ module.exports = function (req, res, next) {
     else {
       logdata += '\nDecryption failed';
       log.log(logreq, logdata);
-      next(new Error("bad_login"));
+      next(new Error("BAD_LOGIN"));
     }
   });
 };
