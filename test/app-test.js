@@ -277,7 +277,9 @@ after(function(done) {
   var testdb = basepath + '/../testing_db.kdbx';
   fs.unlink(testdb, function(err) {
     // Don't throw an error if file doesn't exist
-    if (err.code != 'ENOENT') throw err;
+    if (err) {
+      if (err.code != 'ENOENT') throw err;
+    }
     done();
   });
 });

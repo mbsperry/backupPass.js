@@ -55,6 +55,8 @@ hr {
 
 #accounts {
   text-align: left;
+  height: 200px;
+  overflow: auto;
 }
 
 .acct {
@@ -68,8 +70,6 @@ hr {
 
 #acct_div {
   text-align: left;
-  height: 200px;
-  overflow: auto;
 }
 
 #content {
