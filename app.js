@@ -205,7 +205,6 @@ app.use(function(err, req, res, next) {
   console.error("Error handler received: " + err);
   if (err.message == 'BAD_LOGIN') {
     console.log("Got a bad login error");
-    console.log(err.code);
 
     // Not sure if I want to do this -- 
     // maybe allow people another chance at entering password 
@@ -217,6 +216,7 @@ app.use(function(err, req, res, next) {
   } else if (err.message == 'invalid csrf token') {
     res.status(403).send({ error: 'Invalid session'});
   }else {
+    console.log("Unhandled error, shutting down");
     res.status(500).send("Internal server error");
     server.close();
   }

@@ -19,7 +19,11 @@ var list_accts = function(req, key, keyfile, next) {
     var acctNames = [];
     if (err) {
       logger.log("KDBX unlock failed");
-      return next(new Error("BAD_LOGIN"));
+      if (err.message == 'Master key invalid.') {
+        return next(new Error("BAD_LOGIN"));
+      } else {
+        return next(err);
+      }
     }
     else {
       accts.forEach(function(entry) {
