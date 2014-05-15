@@ -167,16 +167,15 @@ describe('authenticate with invalid key', function() {
   });
 
   // Not currently working -- not sure how csurf outdates tokens
-  it.skip('should fail with an outdated csrf token', function(done) {
+  it('should fail with an incorrect csrf token', function(done) {
     failAgent
     .get('/session')
     .end(function(err, res) {
       failAgent
       .post('/session/auth')
-      .set('X-CSRF-TOKEN', csrfToken)
+      .set('X-CSRF-TOKEN', "Wrong token")
       .send({ key: 'cde94152fe008cce8ce9d42b3964fc55c3eebbab2c9e3079af0f82735c4d0de0' })
-      .expect('Content-Type', /json/)
-      .expect(401, done);
+      .expect(403, done);
     });
   });
   

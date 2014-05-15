@@ -214,7 +214,9 @@ app.use(function(err, req, res, next) {
 
     res.status(401).send({ error: 'Error: Invalid credentials' } );
     bad_login();
-  } else {
+  } else if (err.message == 'invalid csrf token') {
+    res.status(403).send({ error: 'Invalid session'});
+  }else {
     res.status(500).send("Internal server error");
   }
 });
