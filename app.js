@@ -58,6 +58,7 @@ var memStore = new session.MemoryStore();
 try {
   var sessKey = crypto.randomBytes(32).toString('hex');
 } catch (err) {
+  // Have to throw this since the error handler isn't up yet
   throw err;
 }
 
@@ -125,6 +126,11 @@ app.all('*', function(req, res, next) {
   }
 });
 
+if (config.mode == 'test') {
+  app.get('/error', function(req, res, next) {
+    return next(new Error("Unhandled error"));
+  });
+}
 app.get('/', function (req, res) {
   res.sendfile('./public/index.html');
 });
@@ -177,14 +183,14 @@ var bad_login = function(next) {
     //server.close();
     fs.writeFile('./lockfile', 'Server locked', function write(err) {
       if (err) 
-        throw err;
+        return next(err);
     });
     console.log("Deleting all key files");
 
     var deleteKeyFiles = function(err, files) {
-      if (err) throw err;
+      if (err) return next(err);
       files.forEach(function (file) {
-        fs.unlink(key_prefix + file, function() { if (err) throw err; });
+        fs.unlink(key_prefix + file, function() { if (err) return next(err); });
       });
       deleteKDBX();
     };
@@ -192,7 +198,7 @@ var bad_login = function(next) {
     var deleteKDBX = function() {
       console.log("Deleting KDBX: " + config.keepass_path);
       fs.unlink(config.keepass_path, function(err) {
-        if (err) throw err;
+        if (err) return next(err);
       });
     };
 
@@ -201,25 +207,27 @@ var bad_login = function(next) {
   }
 };
 
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   console.error("Error handler received: " + err);
   if (err.message == 'BAD_LOGIN') {
-    console.log("Got a bad login error");
-
     // Not sure if I want to do this -- 
     // maybe allow people another chance at entering password 
     // before destroying the session?
     req.session = null;
-
     res.status(401).send({ error: 'Error: Invalid credentials' } );
-    bad_login();
+    bad_login(next);
   } else if (err.message == 'invalid csrf token') {
     res.status(403).send({ error: 'Invalid session'});
-  }else {
-    console.log("Unhandled error, shutting down");
-    res.status(500).send("Internal server error");
-    server.close();
+  } else {
+    next(err);
   }
+});
+
+app.use(function errorHandler (err, req, res, next) {
+  console.log("Unhandled error, shutting down");
+  console.log(err.stack);
+  res.status(500).send("Internal server error");
+  process.exit();
 });
 
 

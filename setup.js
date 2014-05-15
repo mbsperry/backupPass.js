@@ -14,7 +14,7 @@
  *
  */
 
-var mc = require('./lib/my_crypto.js');
+var cryptHelp = require('./lib/cryptoHelper.js');
 var fs = require('fs');
 var crypto = require('crypto');
 
@@ -79,7 +79,7 @@ get_keys(function () {
 
   for (var c = 0; c<5; c++) {
     filename = prefix + "key" + c + ".crypt";
-    mc.write_encrypted_phrase(key_file, keys[c], filename);
+    cryptHelp.write_encrypted_phrase(key_file, keys[c], filename);
     console.log("Writing: " + filename);
     console.log("Key: " + keys[c]);
 
