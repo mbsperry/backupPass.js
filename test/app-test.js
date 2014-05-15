@@ -166,18 +166,6 @@ describe('authenticate with invalid key', function() {
     .expect(401, done);
   });
 
-  // Not currently working -- not sure how csurf outdates tokens
-  it('should fail with an incorrect csrf token', function(done) {
-    failAgent
-    .get('/session')
-    .end(function(err, res) {
-      failAgent
-      .post('/session/auth')
-      .set('X-CSRF-TOKEN', "Wrong token")
-      .send({ key: 'cde94152fe008cce8ce9d42b3964fc55c3eebbab2c9e3079af0f82735c4d0de0' })
-      .expect(403, done);
-    });
-  });
   
   it('should delete all key files after three failed login attempts', function(done) {
     // One more bad login required first
@@ -206,6 +194,30 @@ describe('authenticate with invalid key', function() {
     });
   });
 
+});
+
+describe('Sessions should be secure', function() {
+  var csrfToken;
+
+  before(function(done) {
+    var setToken = function(err, token) {
+      csrfToken = token;
+      done();
+    };
+    getToken(failAgent, setToken);
+  });
+
+  it('should fail with an incorrect csrf token', function(done) {
+    failAgent
+    .post('/session/auth')
+    .set('X-CSRF-TOKEN', "Wrong token")
+    .send({ key: 'cde94152fe008cce8ce9d42b3964fc55c3eebbab2c9e3079af0f82735c4d0de0' })
+    .expect(403, done);
+  });
+
+  // Need to implement this later
+  it.skip('should fail with an invalid cookie', function(done) {
+  });
 });
 
 
