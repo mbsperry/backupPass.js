@@ -90,3 +90,10 @@ get_keys(function () {
     fs.writeFileSync("./do_not_include/keyset.txt", msg, 'utf8');
   }
 });
+
+// Copy testing_db.kdbx if in 'test' mode
+if (production === false) {
+  var spawn = require('child_process').spawn,
+    cp_db = spawn('cp', ['./test/data/testing_db.kdbx', '.']);
+}
+

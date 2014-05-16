@@ -1,4 +1,4 @@
-/*global $:false*/
+/*global $:false, document:false */
 // Client side jquery logic for BackupPass
 // Copyright Matthew Sperry 2014, distributed under the MIT license
 // Turn on jQuery options for JSHint
@@ -69,22 +69,24 @@ $(document).ready(function() {
         $("#input").css("text-align", "left");
         $("#verify").show("fast");
         var parameters = { pass: $("#pass").val() };
+
         var success = function(data, _, xhr) {
-          var html = "";
+          var listSize,
+              html = "";
           data.forEach(function(entry) {
             html += "<p class='acct'>" + entry + "</p>";
           });
+          listSize = data.length * 1.5;
+          if (listSize > 12) {
+            $("#accounts").css("height", '12em');
+          }
           $("#accounts").html(html);
           $("#verify").hide("fast");
           $("#acct_div").show("fast");
           csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
         };
+
         send_ajax_post('/session/secure/list', parameters, success);
-        //.fail(function() {
-          //$("#accounts").html(bad_loginHTML);
-          //$("#verify").hide("fast");
-          //$("#acct_div").show("fast");
-        //});
       });
       return false;
     }
@@ -92,22 +94,24 @@ $(document).ready(function() {
 
   $("#accounts").on("mouseover", ".acct", function() {
     $(this).css("font-weight", "bold");
+    $(this).css("background", "rgba(176,176,176,0.4)");
   });
   $("#accounts").on("mouseleave", ".acct", function() {
     $(this).css("font-weight", "normal");
+    $(this).css("background", "");
   });
 
   $("#accounts").on('click', '.acct', function() {
     var html = "";
     var index = $(".acct").index(this);
-    var acct = $(".acct")[index];
+    var acct = $(".acct").eq(index).text();
     var parameters = { index: index };
     var success = function(data, _, xhr) {
       $("#accounts").hide("fast");
       html += "<tr><td>Username:</td><td>" + data.username + "</td></tr>";
       html += "<tr><td>Password:</td><td>" + data.password +"</td></tr>";
       html += "<tr><td>Notes:</td><td>" + data.notes + "</td></tr>";
-      $("#acct_headline").html(acct);
+      $("#acct_headline").text(acct);
       $("#pass_text").html(html);
       $("#pass_text").show();
       csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
