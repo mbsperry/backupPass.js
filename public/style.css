@@ -114,10 +114,25 @@ hr {
   text-align: left;
 }
 
+.form p {
+	font-weight: bold;
+	border: none;
+}
+
+.form div {
+	background: grey;
+}
+
+.form span {
+	display: block;
+}
+
 .input_field {
-  margin-top: 0.4em;
+	border-style: none;
   font-size: 0.75em;
-  font-family: "Andale Mono", monospace; 
+  font-family: "Andale Mono", monospace;
+  width: 100%;
+  height: 1.6em;
 }
 
 #copyleft {
