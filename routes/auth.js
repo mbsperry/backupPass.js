@@ -2,7 +2,7 @@
  * Logic for the '/session/auth' route
  */
 
-var log = require('../lib/log');
+var logger = require('../lib/log');
 var config = require('../lib/config');
 var cryptHelp = require('../lib/cryptoHelper');
 var fs = require('fs');
@@ -36,7 +36,7 @@ module.exports = function (req, res, next) {
     // Was the key properly decrypted?
     if (req.session.clear_key) {
       logdata += '\n***Decryption success***';
-      log.log(logreq, logdata);
+      logger(3, logreq, logdata);
 
       fs.unlink(cryptfile, function (err) {
         if (err) {
@@ -49,7 +49,7 @@ module.exports = function (req, res, next) {
     }
     else {
       logdata += '\nDecryption failed';
-      log.log(logreq, logdata);
+      logger(3, logreq, logdata);
       next(new Error("BAD_LOGIN"));
     }
   });

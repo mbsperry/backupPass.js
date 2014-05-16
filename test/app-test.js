@@ -10,6 +10,7 @@ var getToken = require('./getToken');
 //request = request('http://localhost:8000');
 process.env.NODE_ENV = 'test';
 process.env.KEEPASS_PATH = './testing_db.kdbx';
+process.env.LOG_LEVEL = 'quiet';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 

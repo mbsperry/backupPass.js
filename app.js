@@ -32,7 +32,7 @@ var checkLoginKey = function (req, res, next) {
   if (req.session.login === true) {
     next();
   } else {
-    console.log("Invalid login session");
+    logger(2, "Invalid login session");
     res.send("Error: invalid session");
   }
 };
@@ -185,7 +185,7 @@ var bad_login = function(next) {
       if (err) 
         return next(err);
     });
-    console.log("Deleting all key files");
+    logger(2, "Deleting all key files");
 
     var deleteKeyFiles = function(err, files) {
       if (err) return next(err);
@@ -196,19 +196,19 @@ var bad_login = function(next) {
     };
 
     var deleteKDBX = function() {
-      console.log("Deleting KDBX: " + config.keepass_path);
+      logger(2, "Deleting KDBX: " + config.keepass_path);
       fs.unlink(config.keepass_path, function(err) {
         if (err) return next(err);
       });
     };
 
     fs.readdir(key_prefix, deleteKeyFiles);
-    logger.log('Server locked');
+    logger(2, 'Server locked');
   }
 };
 
 app.use(function (err, req, res, next) {
-  console.error("Error handler received: " + err);
+  logger(2, "Error handler received: " + err);
   if (err.message == 'BAD_LOGIN') {
     // Not sure if I want to do this -- 
     // maybe allow people another chance at entering password 
@@ -224,8 +224,8 @@ app.use(function (err, req, res, next) {
 });
 
 app.use(function errorHandler (err, req, res, next) {
-  console.log("Unhandled error, shutting down");
-  console.log(err.stack);
+  logger(1, "Unhandled error, shutting down");
+  logger(1, err.stack);
   res.status(500).send("Internal server error");
   process.exit();
 });
@@ -240,7 +240,7 @@ app.use(function errorHandler (err, req, res, next) {
 
 try {
   fs.readFileSync('./lockfile');
-    console.log("locked");
+    logger(1, "locked");
 } catch (err) {
   // Only start the server if the file doesn't exist
 
@@ -249,12 +249,12 @@ try {
     // Trust heroku's forwarding -- note that this can be spoofed easily
 
     server = app.listen(process.env.PORT || 5000);
-    console.log("Server started");
+    logger(1, "Server started");
   }
   else
   {
     server = app.listen(3000);
-    console.log("App server started");
+    logger(1, "Testing server started");
   }
 
 }
@@ -264,7 +264,7 @@ server.restart = function() {
   if (config.mode != 'production') {
     lockout = false;
     server.listen(8443);
-    console.log("Server restarted");
+    logger(2, "Server restarted");
   }
 };
 

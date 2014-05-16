@@ -18,7 +18,7 @@ var list_accts = function(req, key, keyfile, next) {
   var make_acct_list = function(err, accts) {
     var acctNames = [];
     if (err) {
-      logger.log("KDBX unlock failed");
+      logger(3, "KDBX unlock failed");
       if (err.message == 'Master key invalid.') {
         return next(new Error("BAD_LOGIN"));
       } else {
@@ -29,13 +29,13 @@ var list_accts = function(req, key, keyfile, next) {
       accts.forEach(function(entry) {
         acctNames.push(entry.title);
       });
-      logger.log('***KDBX unlock success***');
+      logger(3, '***KDBX unlock success***');
     }
     fs.unlink(keyfile, function (err) {
       if (err) {
         return next(err);
       }
-      console.log("Deleted: " + keyfile);
+      logger(2, "Deleted: " + keyfile);
     });
 
     req.session.accts = accts;
