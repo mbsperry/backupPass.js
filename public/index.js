@@ -7,7 +7,7 @@
 
 $(document).ready(function() {
   var csrfToken;
-  var bad_loginHTML = "Incorrect authorization<br>Wait 2 seconds before retrying";
+  var bad_loginHTML = "Invalid Credentials";
   $.get('/version', function(data) {
     $("#version").html(data);
   });
@@ -30,7 +30,8 @@ $(document).ready(function() {
       success: success,
       error: function() {
         $("#verify").show("fast");
-        $("#verify").html(bad_loginHTML);
+        $("#verify #e").text("Error");
+        $("#verify #msg").html(bad_loginHTML);
       }
     });
   };
@@ -40,20 +41,24 @@ $(document).ready(function() {
   $("#key").focus();
 
   var key_submit = function() {
-    $("#app").css("overflow", "visible");
-    $("#key_div").animate({'left':'-=39em'}, {queue: false, complete: function() {
-      $("#key_div").hide();
-      var parameters = {key: $("#key").val()};
-      var success = function(data, _, xhr) {
-        if (data.response === true) {
-          $("#pass").focus();
-          csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
-        }
-      };
-      send_ajax_post('session/auth', parameters, success);
-    }
-    }, 500);
-    $("#pass_div").animate({'left':'-=39em'}, {queue: false}, 500);
+    var parameters = {key: $("#key").val()};
+    var success = function(data, _, xhr) {
+      if (data.response === true) {
+        $("#app").css("overflow", "visible");
+        $("#verify").hide();
+        $("#key_div")
+          .animate({'left':'-=39em'}, {queue: false, complete: function() {
+            $("#key_div").hide();
+            $("#pass").focus();
+          }
+        }, 100);
+
+        $("#pass_div").animate({'left':'-=39em'}, {queue: false}, 500);
+
+        csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
+      }
+    };
+    send_ajax_post('session/auth', parameters, success);
   };
 
   $('#key').keypress(function (e) {
@@ -72,7 +77,7 @@ $(document).ready(function() {
       $("#input").css("padding-top", "10px");
       $("#input").css("padding-bottom", "10px");
       $("#input").css("text-align", "left");
-      $("#verify").show("fast");
+      $("#acct_div").show("fast");
       var parameters = { pass: $("#pass").val() };
 
       var success = function(data, _, xhr) {

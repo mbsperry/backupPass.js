@@ -83,7 +83,10 @@ app.post('/session/secure/list', function(req, res) {
 });
 
 // Check key
-app.post('/session/auth', function(req, res) {
+app.post('/session/auth', function(req, res, next) {
+  if (req.body.key == "error") { 
+    next(new Error("BAD_LOGIN"));
+  }
   res.send({ response: true});
 });
 
