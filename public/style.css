@@ -77,11 +77,9 @@ hr {
 
 #content {
   padding-left: 2em;
-  white-space: nowrap;
 }
 
 #verify {
-  padding-top: 1em;
   height: 2em;
   line-height: 2em;
   width: 100%;
@@ -106,16 +104,16 @@ hr {
 }
 
 #key_div {
-  display: inline-block;
-  position: relative;
-  width: 100%;
+  /*display: inline-block;*/
+  /*position: relative;*/
+  width: 37em;
 }
 
 #pass_div {
-  display: inline-block;
-  position: relative;
-  left: 39em;
-  width: 100%;
+  /*display: inline-block;*/
+  /*position: relative;*/
+  width: 37em;
+  display: none;
 }
 
 .form {
@@ -154,13 +152,11 @@ hr {
 }
 
 .form_button:active {
-  -moz-box-shadow:    inset 0 0 10px #000000;
-  -webkit-box-shadow: inset 0 0 10px #000000;
-  box-shadow:         inset 0 0 10px #000000;
+  background: #88722E;
 }
 
 .form span {
-	display: block;
+	/*display: block;*/
   clear: both;
 }
 

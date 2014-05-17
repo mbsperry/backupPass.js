@@ -44,16 +44,27 @@ $(document).ready(function() {
     var parameters = {key: $("#key").val()};
     var success = function(data, _, xhr) {
       if (data.response === true) {
-        $("#app").css("overflow", "visible");
         $("#verify").hide();
-        $("#key_div")
-          .animate({'left':'-=39em'}, {queue: false, complete: function() {
-            $("#key_div").hide();
-            $("#pass").focus();
-          }
-        }, 100);
+        var $parent = $("#content");
+        var width = $parent.width();
+        var height = $("#key_div").height();
+        var position = $("#key_div").offset();
+         
+        // Cludge to keep parent from collapsing
+        // when position is set to absolute...
+        $parent.css({height: height});
 
-        $("#pass_div").animate({'left':'-=39em'}, {queue: false}, 500);
+        $("#key_div").css({left: position.left, position: 'absolute'});
+        $("#pass_div").hide().css({left: width * 2.5, position: 'absolute'});
+
+        $("#key_div").animate({left: -width},500);
+
+        $("#pass_div").show().animate({left: position.left}, 500, function() {
+          $("#pass_div").css({left: null, position: null});
+          $("#key_div").hide();
+          $("#key_div").css({left: null, position: null});
+          $("#pass").focus();
+        });
 
         csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
       }
@@ -74,6 +85,10 @@ $(document).ready(function() {
 
   var pass_submit = function () {
     $("#pass_form").hide("fast", function() {
+
+      // Reset content div height back to auto... kludge
+      $("#content").css({height: 'auto'});
+
       $("#input").css("padding-top", "10px");
       $("#input").css("padding-bottom", "10px");
       $("#input").css("text-align", "left");
