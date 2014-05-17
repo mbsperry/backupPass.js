@@ -74,7 +74,8 @@ node app.js
 
 ## Options
 
-Stored as env variables
+Stored as env variables. If running locally, can be stored in
+`config.json`. See `lib/config.js` for details.
 
 - `NODE_ENV = 'production'`
     - Stores encrypted keyfiles in `./keys/`
@@ -83,5 +84,15 @@ Stored as env variables
     - Stores encrypted keyfiles in `./testing/`
     - Starts self-signed https server
     - loads keepass database from `./keepass/testing.kdbx`
+- `REDIRECT`
+    - `default = false`: Redirects http requests to https. Default is to ignore all http requests.
 - `KEEPASS_PATH`
     - Specifies alternate path for keepass database
+- `LOG_LEVEL`
+    - `Default: quiet`: Minimal logging to the console. Logins and error messages get logged to `log.txt`.
+    - `"verbose"`
+
+## Compatibility
+
+- Tested extensively in Chrome
+- use `/legacy` for a rather clunky version that works well in older browsers

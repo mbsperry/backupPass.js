@@ -4,6 +4,10 @@
 // Turn on jQuery options for JSHint
 //
 
+/* 
+ * Legacy App for use in ancient versions of IE
+ */
+
 
 $(document).ready(function() {
   var csrfToken;
