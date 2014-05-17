@@ -1,3 +1,8 @@
+/* This is a mockup server for testing the front end UX
+ * It only serves a fake account list and account
+ * It does no actual authentication
+ */
+
 var fs = require('fs');
 var bodyParser = require('body-parser');
 var helmet = require('helmet');
@@ -119,5 +124,6 @@ app.use(function errorHandler (err, req, res, next) {
 
 server = app.listen(3000);
 logger(1, "Front End Testing server started");
+logger(1, "This is a mockup server with no functionality");
 
 module.exports = server;
