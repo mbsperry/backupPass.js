@@ -46,7 +46,7 @@ $(document).ready(function() {
       if (data.response === true) {
         $("#verify").hide();
         var $parent = $("#content");
-        var width = $parent.width();
+        var width = $(window).width();
         var height = $("#key_div").height();
         var position = $("#key_div").offset();
          
@@ -55,7 +55,7 @@ $(document).ready(function() {
         $parent.css({height: height});
 
         $("#key_div").css({left: position.left, position: 'absolute'});
-        $("#pass_div").hide().css({left: width * 2.5, position: 'absolute'});
+        $("#pass_div").hide().css({left: width, position: 'absolute'});
 
         $("#key_div").animate({left: -width},500);
 
