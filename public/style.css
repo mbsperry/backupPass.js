@@ -146,7 +146,7 @@ table .td_body {
   background-color: grey;
   */
   width: 38.5em;
-  /*overflow: hidden;*/
+  overflow: hidden;
   padding-top: 150px;
   text-align: right;
   font-family: Verdana, Helvetica, Sans-serif;

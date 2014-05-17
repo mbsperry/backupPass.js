@@ -40,6 +40,7 @@ $(document).ready(function() {
   $("#key").focus();
 
   var key_submit = function() {
+    $("#app").css("overflow", "visible");
     $("#key_div").animate({'left':'-=39em'}, {queue: false, complete: function() {
       $("#key_div").hide();
       var parameters = {key: $("#key").val()};
@@ -53,7 +54,6 @@ $(document).ready(function() {
     }
     }, 500);
     $("#pass_div").animate({'left':'-=39em'}, {queue: false}, 500);
-
   };
 
   $('#key').keypress(function (e) {
