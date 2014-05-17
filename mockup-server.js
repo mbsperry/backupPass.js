@@ -50,6 +50,10 @@ app.get('/', function (req, res) {
   res.sendfile('./public/index.html');
 });
 
+app.get('/legacy', function(req, res) {
+  res.sendfile('./public/legacy.html');
+});
+
 app.get('/version', function(req, res) {
   res.send(version);
 });
@@ -58,8 +62,20 @@ app.get('/style.css', function(req, res) {
   res.sendfile('./public/style.css');
 });
 
+app.get('/legacy.css', function(req, res) {
+  res.sendfile('./public/legacy.css');
+});
+
 app.get('/index.js', function(req, res) {
   res.sendfile('./public/index.js');
+});
+
+app.get('/legacy.js', function(req, res) {
+  res.sendfile('./public/legacy.js');
+});
+
+app.get('/json2.js', function(req, res) {
+  res.sendfile('./public/json2.js');
 });
 
 app.get('/jquery-1.11.0.min.js', function(req, res) {

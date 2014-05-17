@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <title>BackupPass</title>
+
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" type="text/css" href="legacy.css">
+    <script src="jquery-1.11.0.min.js"></script>
+
+    <script src="json2.js"></script>
+    <script src="legacy.js"> </script>
+  </head>
+
+  <body>
+    <div id="app">
+      <h3 class="title">
+        <a href="https://github.com/mbsperry/backupPass.js">Backup.Pass
+      </a></h3>
+
+      <div id="content">
+
+        <div id="key_div">
+          <form id="key_form" class="form" autocomplete="off">
+            <div class="form_title">backup.pass key:</div>
+            <div class="form_button">Submit</div>
+            <span class="input_field"><input type="text" id="key" class="input_field"></span>
+          </form>
+        </div>
+
+        <div id="pass_div">
+          <form id="pass_form" class="form" autocomplete="off">
+            <div class="form_title">KeePass Password:</div>
+            <div class="form_button">Submit</div>
+            <span class="input_field"><input type="text" id="pass" class="input_field"></span>
+          </form>
+        </div>
+
+        <div id="verify" class="hidden">
+          <div id ="e"></div>
+          <div id="msg">Loading...</div>
+        </div>
+
+        <div id="acct_div" class="hidden">
+          <p id="acct_headline">Accounts</p>
+          <div id="accounts">Loading...</Div>
+          <table id="acct_table" class="hidden"></table>
+        </div>
+      </div>
+      <div id="copyleft">
+        <a href="https://github.com/mbsperry/backupPass.js">BackupPass</a>
+        version <span id="version">0.0.0</span>. Open source, MIT license. 2014.
+      </div>
+
+    </div>
+  </body>
+</html>
