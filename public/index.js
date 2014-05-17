@@ -40,17 +40,20 @@ $(document).ready(function() {
   $("#key").focus();
 
   var key_submit = function() {
-    $("#key_form").hide("fast", function() {
+    $("#key_div").animate({'left':'-=39em'}, {queue: false, complete: function() {
+      $("#key_div").hide();
       var parameters = {key: $("#key").val()};
       var success = function(data, _, xhr) {
         if (data.response === true) {
-          $("#pass_form").show("fast");
           $("#pass").focus();
           csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
         }
       };
       send_ajax_post('session/auth', parameters, success);
-    });
+    }
+    }, 500);
+    $("#pass_div").animate({'left':'-=39em'}, {queue: false}, 500);
+
   };
 
   $('#key').keypress(function (e) {
@@ -60,45 +63,47 @@ $(document).ready(function() {
     }
   });
 
+  $('#key_form .form_button').click(function() {
+    key_submit();
+  });
+
+  var pass_submit = function () {
+    $("#pass_form").hide("fast", function() {
+      $("#input").css("padding-top", "10px");
+      $("#input").css("padding-bottom", "10px");
+      $("#input").css("text-align", "left");
+      $("#verify").show("fast");
+      var parameters = { pass: $("#pass").val() };
+
+      var success = function(data, _, xhr) {
+        var listSize,
+      html = "";
+    data.forEach(function(entry) {
+      html += "<p class='acct'>" + entry + "</p>";
+    });
+    listSize = data.length * 1.5;
+    if (listSize > 12) {
+      $("#accounts").css("height", '12em');
+    }
+    $("#accounts").html(html);
+    $("#verify").hide("fast");
+    $("#acct_div").show("fast");
+    csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
+      };
+
+      send_ajax_post('/session/secure/list', parameters, success);
+    });
+  };
+
   $("#pass").keypress(function (e) {
     if (e.which == 13) {
-
-      $("#pass_form").hide("fast", function() {
-        $("#input").css("padding-top", "10px");
-        $("#input").css("padding-bottom", "10px");
-        $("#input").css("text-align", "left");
-        $("#verify").show("fast");
-        var parameters = { pass: $("#pass").val() };
-
-        var success = function(data, _, xhr) {
-          var listSize,
-              html = "";
-          data.forEach(function(entry) {
-            html += "<p class='acct'>" + entry + "</p>";
-          });
-          listSize = data.length * 1.5;
-          if (listSize > 12) {
-            $("#accounts").css("height", '12em');
-          }
-          $("#accounts").html(html);
-          $("#verify").hide("fast");
-          $("#acct_div").show("fast");
-          csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
-        };
-
-        send_ajax_post('/session/secure/list', parameters, success);
-      });
+      pass_submit();
       return false;
     }
   });
 
-  $("#accounts").on("mouseover", ".acct", function() {
-    $(this).css("font-weight", "bold");
-    $(this).css("background", "rgba(176,176,176,0.4)");
-  });
-  $("#accounts").on("mouseleave", ".acct", function() {
-    $(this).css("font-weight", "normal");
-    $(this).css("background", "");
+  $("#pass_form .form_button").click(function() {
+    pass_submit();
   });
 
   $("#accounts").on('click', '.acct', function() {
@@ -107,13 +112,12 @@ $(document).ready(function() {
     var acct = $(".acct").eq(index).text();
     var parameters = { index: index };
     var success = function(data, _, xhr) {
-      $("#accounts").hide("fast");
-      html += "<tr><td>Username:</td><td>" + data.username + "</td></tr>";
-      html += "<tr><td>Password:</td><td>" + data.password +"</td></tr>";
-      html += "<tr><td>Notes:</td><td>" + data.notes + "</td></tr>";
-      $("#acct_headline").text(acct);
-      $("#pass_text").html(html);
-      $("#pass_text").show();
+      $("#accounts").hide();
+      html += "<tr><td>Username:</td><td class='td_body'>" + data.username + "</td></tr>";
+      html += "<tr><td>Password:</td><td class='td_body'>" + data.password +"</td></tr>";
+      html += "<tr><td>Notes:</td><td class='td_body'>" + data.notes + "</td></tr>";
+      $("#acct_div acct_headline").text(acct);
+      $("#acct_div #acct_table").html(html).show();
       csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
     };
     send_ajax_post('/session/secure/show', parameters, success);
