@@ -49,25 +49,16 @@ $(document).ready(function() {
     var success = function(data, _, xhr) {
       if (data.response === true) {
         $("#verify").hide();
-        var $parent = $("#content");
-        var width = $(window).width();
-        var height = $("#key_div").height();
-        var position = $("#key_div").offset();
-         
-        // Cludge to keep parent from collapsing
-        // when position is set to absolute...
-        $parent.css({height: height});
+        var width = $("#content").width();
 
-        $("#key_div").css({left: position.left, position: 'absolute'});
-        $("#pass_div").hide().css({left: width, position: 'absolute'});
-
-        $("#key_div").animate({left: -width},500);
-
-        $("#pass_div").show().animate({left: position.left}, 500, function() {
-          $("#pass_div").css({left: null, position: null});
-          $("#key_div").hide();
-          $("#key_div").css({left: null, position: null});
-          $("#pass").focus();
+        $(".input_div").css({position: 'relative'})
+          .animate({left: "-50%"}, 500, function() { 
+            $(this).css({position: null});
+            //Take pass_form out of #login_divs so it doesn't move when
+            //we hide the #key_form
+            $("#pass_form").appendTo($("#content"));
+            $("#key_div").hide();
+            $("#pass").focus();
         });
 
         csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');

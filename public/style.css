@@ -67,7 +67,7 @@ hr {
   background-color: grey;
   */
   width: 38.5em;
-  overflow: hidden;
+  /*overflow: hidden;*/
   padding-top: 150px;
   text-align: right;
   font-family: Verdana, Helvetica, Sans-serif;
@@ -77,6 +77,7 @@ hr {
 
 #content {
   padding-left: 2em;
+  overflow: hidden;
 }
 
 #verify {
@@ -103,17 +104,14 @@ hr {
   float: left;
 }
 
-#key_div {
-  /*display: inline-block;*/
-  /*position: relative;*/
-  width: 37em;
+#login_divs {
+  width: 200%;
+  overflow: hidden;
 }
 
-#pass_div {
-  /*display: inline-block;*/
-  /*position: relative;*/
-  width: 37em;
-  display: none;
+.input_div {
+  width: 50%;
+  float: left;
 }
 
 .form {
@@ -147,13 +145,26 @@ hr {
   cursor: pointer;
 }
 
-.form_button:hover {
+.form_button:active {
   background: #AA8F39;
 }
 
-.form_button:active {
-  background: #88722E;
+#pass_form .form_title {
+  background: #CBB466;
+  color: #674F00;
 }
+
+#pass_form .form_button {
+  background: #476584;
+  /*Fallback...*/
+  color: fff;
+  color: rgba(256,256,256,0.7);
+}
+
+#pass_form .form_button:active {
+  background: #39516A; 
+}
+
 
 .form span {
 	/*display: block;*/
