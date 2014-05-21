@@ -1,41 +1,41 @@
-var fs = require('fs');
-var crypto = require('crypto');
-var bodyParser = require('body-parser');
-var helmet = require('helmet');
-var csrf = require('csurf');
+var fs = require('fs')
+  , crypto = require('crypto')
+  , bodyParser = require('body-parser')
+  , helmet = require('helmet')
+  , csrf = require('csurf')
 
 // Load logger
-var logger = require('./lib/log');
+  , logger = require('./lib/log')
 
 // Load config options
-var config = require('./lib/config');
+  , config = require('./lib/config')
 
 // Load application routes
-var auth = require('./routes/auth.js');
-var list = require('./routes/list.js');
-var show = require('./routes/show.js');
+  , auth = require('./routes/auth.js')
+  , list = require('./routes/list.js')
+  , show = require('./routes/show.js')
 
 // Load express
-var express = require('express');
-var cookieParser = require('cookie-parser');
-var session = require('express-session');
+  , express = require('express')
+  , cookieParser = require('cookie-parser')
+  , session = require('express-session')
 
-var app = express();
-var use_secure_cookies;
+  , app = express()
+  , use_secure_cookies
 
 /*            
  *            Define middleware
  */
 
 
-var checkLoginKey = function (req, res, next) {
+function checkLoginKey (req, res, next) {
   if (req.session.login === true) {
-    next();
+    next()
   } else {
-    logger(2, "Invalid login session");
-    res.send("Error: invalid session");
+    logger(2, "Invalid login session")
+    res.send("Error: invalid session")
   }
-};
+}
 
 
 
@@ -43,30 +43,30 @@ var checkLoginKey = function (req, res, next) {
  *          Setup middleware
  */
 
-app.enable('trust proxy');
-app.use(helmet.defaults());
-app.use(bodyParser.json()); // support for URL-encoded bodies in posts
-app.use(cookieParser());
+app.enable('trust proxy')
+app.use(helmet.defaults())
+app.use(bodyParser.json()) // support for URL-encoded bodies in posts
+app.use(cookieParser())
 
 // This is designed to be a single use web server. It should only be handling
 // a single session at any time, so I think it is acceptable to use MemoryStore in
 // this case, even though it does not scale.
-var memStore = new session.MemoryStore();
+var memStore = new session.MemoryStore()
 
 // Use a randomly generated session key. Persistence is not important in
 // this application.
 try {
-  var sessKey = crypto.randomBytes(32).toString('hex');
+  var sessKey = crypto.randomBytes(32).toString('hex')
 } catch (err) {
   // Have to throw this since the error handler isn't up yet
-  throw err;
+  throw err
 }
 
 
 if (config.mode == 'production') {
-  use_secure_cookies = true;
+  use_secure_cookies = true
 } else {
-  use_secure_cookies = false;
+  use_secure_cookies = false
 }
 
 app.use('/session', session({
@@ -79,25 +79,24 @@ app.use('/session', session({
     httpOnly: true,
     maxage: 300000
   }
-}));
-app.use('/session/secure', checkLoginKey);
-app.use('/session', csrf());
+}))
+app.use('/session/secure', checkLoginKey)
+app.use('/session', csrf())
 app.use('/session', function(req, res, next) {
-  res.set({'X-CSRF-TOKEN': req.csrfToken()});
-  next();
-});
+  res.set({'X-CSRF-TOKEN': req.csrfToken()})
+  next()
+})
 
 /* 
  *            Application Logic
  *
  */
 
-var version = require('./package.json').version;
-var login_attempts = 0;
-var login_pause = false;
-var lockout = false;
-var lockfile = './lockfile';
-var server;
+var version = require('./package.json').version
+  , login_attempts = 0
+  , login_pause = false
+  , lockout = false
+  , server
 
 
 /*
@@ -112,140 +111,143 @@ app.all('*', function(req, res, next) {
   if (lockout === false && login_pause === false) {
     if (config.mode == "production") {
       if (req.headers['x-forwarded-proto']=='https') {
-        next();
+        next()
       } else {
         if (config.redirect === true) {
-          res.redirect('https://' + req.host);
+          res.redirect('https://' + req.host)
         }
       }
     } else {
-      next();
+      next()
     }
   } else {
-    res.status(404).send({ error: 'Not found' } );
+    res.status(404).send({ error: 'Not found' } )
   }
-});
+})
 
 if (config.mode == 'test') {
   app.get('/error', function(req, res, next) {
-    return next(new Error("Unhandled error"));
-  });
+    return next(new Error("Unhandled error"))
+  })
 }
 
 app.get('/', function (req, res) {
-  res.sendfile('./public/index.html');
-});
+  res.sendfile('./public/index.html')
+})
 
 app.get('/legacy', function(req, res) {
-  res.sendfile('./public/legacy.html');
-});
+  res.sendfile('./public/legacy.html')
+})
 
 app.get('/version', function(req, res) {
-  res.send(version);
-});
+  res.send(version)
+})
 
 app.get('/style.css', function(req, res) {
-  res.sendfile('./public/style.css');
-});
+  res.sendfile('./public/style.css')
+})
 
 app.get('/legacy.css', function(req, res) {
-  res.sendfile('./public/legacy.css');
-});
+  res.sendfile('./public/legacy.css')
+})
 
 app.get('/index.js', function(req, res) {
-  res.sendfile('./public/index.js');
-});
+  res.sendfile('./public/index.js')
+})
 
 app.get('/legacy.js', function(req, res) {
-  res.sendfile('./public/legacy.js');
-});
+  res.sendfile('./public/legacy.js')
+})
 
 app.get('/json2.js', function(req, res) {
-  res.sendfile('./public/json2.js');
-});
+  res.sendfile('./public/json2.js')
+})
 
 app.get('/jquery-1.11.0.min.js', function(req, res) {
-  res.sendfile('./public/jquery-1.11.0.min.js');
-});
+  res.sendfile('./public/jquery-1.11.0.min.js')
+})
 
 // Show account information
-app.post('/session/secure/show', show);
+app.post('/session/secure/show', show)
 
 // Show account list
-app.post('/session/secure/list', list);
+app.post('/session/secure/list', list)
 
 app.get('/session', function(req, res) {
-  res.send({'Token': req.csrfToken()});
-});
+  res.send({'Token': req.csrfToken()})
+})
 
 // Check key
-app.post('/session/auth', auth);
+app.post('/session/auth', auth)
 
 /*
  *      Error handling
  */
 
-var bad_login = function(next) {
-  var pauseLength;
-  var key_prefix = config.key_prefix;
-  login_attempts += 1;
-  login_pause = true;
+function bad_login (next) {
+  var pauseLength
+    , deleteKeyFiles
+    , deleteKDBX
+    , key_prefix = config.key_prefix
+
+  login_attempts += 1
+  login_pause = true
 
   setTimeout(function() {
-    login_pause = false;
-  }, pauseLength);
+    login_pause = false
+  }, pauseLength)
 
   if (login_attempts > 2) {
-    lockout = true;
-    //server.close();
+    lockout = true
+    //server.close()
     fs.writeFile('./lockfile', 'Server locked', function write(err) {
-      if (err) 
-        return next(err);
-    });
-    logger(2, "Deleting all key files");
+      if (err)
+        return next(err)
+    })
+    logger(2, "Deleting all key files")
 
-    var deleteKeyFiles = function(err, files) {
-      if (err) return next(err);
+    deleteKeyFiles = function(err, files) {
+      if (err) return next(err)
       files.forEach(function (file) {
-        fs.unlink(key_prefix + file, function() { if (err) return next(err); });
-      });
-      deleteKDBX();
-    };
+        fs.unlink(key_prefix + file, function() { if (err) return next(err) })
+      })
+      deleteKDBX()
+    }
 
-    var deleteKDBX = function() {
-      logger(2, "Deleting KDBX: " + config.keepass_path);
+    deleteKDBX = function() {
+      logger(2, "Deleting KDBX: " + config.keepass_path)
       fs.unlink(config.keepass_path, function(err) {
-        if (err) return next(err);
-      });
-    };
+        if (err) return next(err)
+      })
+    }
 
-    fs.readdir(key_prefix, deleteKeyFiles);
-    logger(2, 'Server locked');
+    fs.readdir(key_prefix, deleteKeyFiles)
+    logger(2, 'Server locked')
   }
-};
+}
 
 app.use(function (err, req, res, next) {
-  logger(2, "Error handler received: " + err);
+  logger(2, "Error handler received: " + err)
   if (err.message == 'BAD_LOGIN') {
     // Not sure if I want to do this -- 
     // maybe allow people another chance at entering password 
     // before destroying the session?
-    req.session = null;
-    res.status(401).send({ error: 'Error: Invalid credentials' } );
-    bad_login(next);
+    req.session = null
+    res.status(401).send({ error: 'Error: Invalid credentials' } )
+    bad_login(next)
   } else if (err.message == 'invalid csrf token') {
-    res.status(403).send({ error: 'Invalid session'});
+    res.status(403).send({ error: 'Invalid session'})
   } else {
-    next(err);
+    next(err)
   }
-});
+})
 
-app.use(function errorHandler (err, req, res, next) {
-  logger(1, "Unhandled error, shutting down");
-  logger(1, err.stack);
-  res.status(500).send("Internal server error");
-  process.exit();
-});
+app.use(function errorHandler (err, req, res, _) {
+  logger(1, "Unhandled error, shutting down")
+  logger(1, err.stack)
+  res.status(500).send("Internal server error")
+  process.exit()
+})
 
 
 /*
@@ -256,8 +258,8 @@ app.use(function errorHandler (err, req, res, next) {
 
 
 try {
-  fs.readFileSync('./lockfile');
-    logger(1, "locked");
+  fs.readFileSync('./lockfile')
+    logger(1, "locked")
 } catch (err) {
   // Only start the server if the file doesn't exist
 
@@ -265,17 +267,17 @@ try {
   {
     // Trust heroku's forwarding -- note that this can be spoofed easily
 
-    server = app.listen(process.env.PORT || 5000);
-    logger(1, "Server started");
+    server = app.listen(process.env.PORT || 5000)
+    logger(1, "Server started")
   }
   else
   {
-    server = app.listen(3000);
-    logger(1, "Testing server started");
-    logger(1, "*******************************************");
-    logger(1, "********       TESTING ONLY        ********");
-    logger(1, "******** THIS SERVER IS NOT SECURE ********");
-    logger(1, "*******************************************");
+    server = app.listen(3000)
+    logger(1, "Testing server started")
+    logger(1, "*******************************************")
+    logger(1, "********       TESTING ONLY        ********")
+    logger(1, "******** THIS SERVER IS NOT SECURE ********")
+    logger(1, "*******************************************")
   }
 
 }
@@ -283,10 +285,10 @@ try {
 // Restart method for testing purposes
 server.restart = function() {
   if (config.mode != 'production') {
-    lockout = false;
-    server.listen(8443);
-    logger(2, "Server restarted");
+    lockout = false
+    server.listen(8443)
+    logger(2, "Server restarted")
   }
-};
+}
 
-module.exports = server;
+module.exports = server
