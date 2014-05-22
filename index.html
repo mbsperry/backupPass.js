@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Backuppass.js by mbsperry</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Backuppass.js</h1>
+          <h2>A simple personal KeePass backup web server built with node.js</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/mbsperry/backupPass.js/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/mbsperry/backupPass.js/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/mbsperry/backupPass.js" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a name="backuppass" class="anchor" href="#backuppass"><span class="octicon octicon-link"></span></a>backup.pass</h1>
+
+<p>A simple personal KeePass backup web server built with node.js</p>
+
+<p><a href="https://travis-ci.org/mbsperry/backupPass.js"><img src="https://travis-ci.org/mbsperry/backupPass.js.svg?branch=master" alt="Build Status"></a></p>
+
+<h2>
+<a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About</h2>
+
+<p>backup.pass aims to supply a little peace of mind to those of use
+who use KeePass. Syncing to a phone works well to have access to
+passwords when away from the home computer, but what happens when
+the phone battery dies or the phone gets lost?</p>
+
+<p>Backup.Pass attempts to address this issue by providing a small,
+personal web server which can access the KeePass database. This is
+meant to be a secure, <em>emergency</em> backup server.</p>
+
+<h2>
+<a name="security" class="anchor" href="#security"><span class="octicon octicon-link"></span></a>Security</h2>
+
+<p>backup.pass is not meant to be used on a regular basis.</p>
+
+<ul>
+<li>Five one-time use encryption keys are generated on setup.</li>
+<li>Each key is used to encrypt a separate copy of the KeePass
+encryption key file. </li>
+<li>Every time a key is used, it is deleted.</li>
+<li>Once the KeePass database key file is decrypted, the user still must
+supply the KeePass password to unlock the database.</li>
+<li>After 3 incorrect attempts: 
+
+<ul>
+<li>The server shuts down.</li>
+<li>All remaining keyfiles are deleted.</li>
+</ul>
+</li>
+<li>Unencrypted Keepass database keys are not stored on the server.</li>
+<li>The Keepass password is never stored in any form.</li>
+</ul><h2>
+<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<ul>
+<li>Express</li>
+<li>KeePass.io</li>
+<li>body-parser</li>
+<li>node-tmp</li>
+<li>cookierParser</li>
+<li>express-session</li>
+<li>helmet</li>
+<li>csurf</li>
+</ul><p>Development dependencies:</p>
+
+<ul>
+<li>mocha</li>
+<li>should</li>
+<li>supertest</li>
+</ul><h2>
+<a name="setup" class="anchor" href="#setup"><span class="octicon octicon-link"></span></a>Setup</h2>
+
+<ul>
+<li>Copy keepass database to <code>./keepass/keepass.kdbx</code>
+</li>
+<li>Copy keepass database key file to <code>./do_not_include/key.key</code>
+</li>
+<li>Build backup.pass keys:</li>
+</ul><div class="highlight highlight-bash"><pre>node setup.js production
+</pre></div>
+
+<ul>
+<li>
+<strong>Print and keep the one-time keys with you.</strong> They won't do you any good unless you have them when you need them!</li>
+</ul><h2>
+<a name="run" class="anchor" href="#run"><span class="octicon octicon-link"></span></a>Run</h2>
+
+<div class="highlight highlight-bash"><pre>node app.js
+</pre></div>
+
+<ul>
+<li>Requires running behind https capable proxy.</li>
+<li>Or deploy to your favorite PaaS.</li>
+</ul><h2>
+<a name="options" class="anchor" href="#options"><span class="octicon octicon-link"></span></a>Options</h2>
+
+<p>Stored as env variables. If running locally, can be stored in
+<code>config.json</code>. See <code>lib/config.js</code> for details.</p>
+
+<ul>
+<li>
+<code>NODE_ENV = 'production'</code>
+
+<ul>
+<li>Stores encrypted keyfiles in <code>./keys/</code>
+</li>
+<li>Expects to run behind a proxy. </li>
+</ul>
+</li>
+<li>
+<code>NODE_ENV = 'test'</code>
+
+<ul>
+<li>Stores encrypted keyfiles in <code>./testing/</code>
+</li>
+<li>Starts self-signed https server</li>
+<li>loads keepass database from <code>./keepass/testing.kdbx</code>
+</li>
+</ul>
+</li>
+<li>
+<code>REDIRECT</code>
+
+<ul>
+<li>
+<code>default = false</code>: Redirects http requests to https. Default is to ignore all http requests.</li>
+</ul>
+</li>
+<li>
+<code>KEEPASS_PATH</code>
+
+<ul>
+<li>Specifies alternate path for keepass database</li>
+</ul>
+</li>
+<li>
+<code>LOG_LEVEL</code>
+
+<ul>
+<li>
+<code>Default: quiet</code>: Minimal logging to the console. Logins and error messages get logged to <code>log.txt</code>.</li>
+<li><code>"verbose"</code></li>
+</ul>
+</li>
+</ul><h2>
+<a name="compatibility" class="anchor" href="#compatibility"><span class="octicon octicon-link"></span></a>Compatibility</h2>
+
+<ul>
+<li>Tested extensively in Chrome</li>
+<li>use <code>/legacy</code> for a rather clunky version that works well in older browsers</li>
+</ul>
+        </section>
+
+        <footer>
+          Backuppass.js is maintained by <a href="https://github.com/mbsperry">mbsperry</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
