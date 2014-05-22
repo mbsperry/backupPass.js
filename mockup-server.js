@@ -3,28 +3,30 @@
  * It does no actual authentication
  */
 
-var fs = require('fs');
-var bodyParser = require('body-parser');
-var helmet = require('helmet');
+var fs = require('fs')
+  , bodyParser = require('body-parser')
+  , helmet = require('helmet')
 
 // Load logger
-var logger = require('./lib/log');
+  , logger = require('./lib/log')
 
 // Load config options
-var config = require('./lib/config');
+  , config = require('./lib/config')
 
 // Load express
-var express = require('express');
+  , express = require('express')
 
-var app = express();
+  , app = express()
 
+  , version = require('./package.json').version
+  , server
 
 /*
  *          Setup middleware
  */
 
-app.use(helmet.defaults());
-app.use(bodyParser.json()); // support for json-encoded bodies in posts
+app.use(helmet.defaults())
+app.use(bodyParser.json()) // support for json-encoded bodies in posts
 
 
 /* 
@@ -32,8 +34,6 @@ app.use(bodyParser.json()); // support for json-encoded bodies in posts
  *
  */
 
-var version = require('./package.json').version;
-var server;
 
 
 /*
@@ -43,44 +43,44 @@ var server;
  */
 
 app.get('/error', function(req, res, next) {
-  return next(new Error("Unhandled error"));
-});
+  return next(new Error("Unhandled error"))
+})
 
 app.get('/', function (req, res) {
-  res.sendfile('./public/index.html');
-});
+  res.sendfile('./public/index.html')
+})
 
 app.get('/legacy', function(req, res) {
-  res.sendfile('./public/legacy.html');
-});
+  res.sendfile('./public/legacy.html')
+})
 
 app.get('/version', function(req, res) {
-  res.send(version);
-});
+  res.send(version)
+})
 
 app.get('/style.css', function(req, res) {
-  res.sendfile('./public/style.css');
-});
+  res.sendfile('./public/style.css')
+})
 
 app.get('/legacy.css', function(req, res) {
-  res.sendfile('./public/legacy.css');
-});
+  res.sendfile('./public/legacy.css')
+})
 
 app.get('/index.js', function(req, res) {
-  res.sendfile('./public/index.js');
-});
+  res.sendfile('./public/index.js')
+})
 
 app.get('/legacy.js', function(req, res) {
-  res.sendfile('./public/legacy.js');
-});
+  res.sendfile('./public/legacy.js')
+})
 
 app.get('/json2.js', function(req, res) {
-  res.sendfile('./public/json2.js');
-});
+  res.sendfile('./public/json2.js')
+})
 
 app.get('/jquery-1.11.0.min.js', function(req, res) {
-  res.sendfile('./public/jquery-1.11.0.min.js');
-});
+  res.sendfile('./public/jquery-1.11.0.min.js')
+})
 
 // Show account information
 app.post('/session/secure/show', function(req, res) {
@@ -88,49 +88,49 @@ app.post('/session/secure/show', function(req, res) {
     username: "Testing only",
     password: "Ultrasecret",
     notes: "Some Additional information\nWould go here"
-  };
-  res.send(result);
-});
+  }
+  res.send(result)
+})
 
 // Show account list
 app.post('/session/secure/list', function(req, res) {
-  var testAccounts = ["Google", "Apple", "Microsoft", "Github", "Work", "Email", "School", "Test1", "Test2", "Test3", "Test4", "Test5", "Test6", "Test7", "Test8"];
-  res.json(testAccounts);
-});
+  var testAccounts = ["Google", "Apple", "Microsoft", "Github", "Work", "Email", "School", "Test1", "Test2", "Test3", "Test4", "Test5", "Test6", "Test7", "Test8"]
+  res.json(testAccounts)
+})
 
 // Check key
 app.post('/session/auth', function(req, res, next) {
   if (req.body.key == "error") { 
-    next(new Error("BAD_LOGIN"));
+    next(new Error("BAD_LOGIN"))
   }
-  res.send({ response: true});
-});
+  res.send({ response: true})
+})
 
 /*
  *      Error handling
  */
 
 app.use(function (err, req, res, next) {
-  logger(2, "Error handler received: " + err);
+  logger(2, "Error handler received: " + err)
   if (err.message == 'BAD_LOGIN') {
     // Not sure if I want to do this -- 
     // maybe allow people another chance at entering password 
     // before destroying the session?
-    req.session = null;
-    res.status(401).send({ error: 'Error: Invalid credentials' } );
+    req.session = null
+    res.status(401).send({ error: 'Error: Invalid credentials' } )
   } else if (err.message == 'invalid csrf token') {
-    res.status(403).send({ error: 'Invalid session'});
+    res.status(403).send({ error: 'Invalid session'})
   } else {
-    next(err);
+    next(err)
   }
-});
+})
 
 app.use(function errorHandler (err, req, res, next) {
-  logger(1, "Unhandled error, shutting down");
-  logger(1, err.stack);
-  res.status(500).send("Internal server error");
-  process.exit();
-});
+  logger(1, "Unhandled error, shutting down")
+  logger(1, err.stack)
+  res.status(500).send("Internal server error")
+  process.exit()
+})
 
 
 /*
@@ -141,8 +141,8 @@ app.use(function errorHandler (err, req, res, next) {
 
 
 
-server = app.listen(3000);
-logger(1, "Front End Testing server started");
-logger(1, "This is a mockup server with no functionality");
+server = app.listen(3000)
+logger(1, "Front End Testing server started")
+logger(1, "This is a mockup server with no functionality")
 
-module.exports = server;
+module.exports = server

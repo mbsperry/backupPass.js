@@ -1,13 +1,7 @@
+// Turn on jQuery options for JSHint
 /*global $:false, document:false */
 // Client side jquery logic for BackupPass
 // Copyright Matthew Sperry 2014, distributed under the MIT license
-// Turn on jQuery options for JSHint
-//
-
-/* 
- * Legacy App for use in ancient versions of IE
- */
-
 
 $(document).ready(function() {
   var csrfToken
