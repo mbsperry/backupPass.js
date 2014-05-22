@@ -32,28 +32,32 @@
 
         <section id="main_content">
           <h1>
-<a name="backuppass" class="anchor" href="#backuppass"><span class="octicon octicon-link"></span></a>backup.pass</h1>
+<a name="backuppass" class="anchor" href="#backuppass"><span class="octicon octicon-link"></span></a>backupPass</h1>
 
-<p>A simple personal KeePass backup web server built with node.js</p>
+<p>A simple personal KeePass backup web server built with node.js and
+<a href="https://github.com/NeoXiD/keepass.io">keepass.io</a></p>
 
 <p><a href="https://travis-ci.org/mbsperry/backupPass.js"><img src="https://travis-ci.org/mbsperry/backupPass.js.svg?branch=master" alt="Build Status"></a></p>
 
 <h2>
 <a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About</h2>
 
-<p>backup.pass aims to supply a little peace of mind to those of use
+<p>backupPass aims to supply a little peace of mind to those of use
 who use KeePass. Syncing to a phone works well to have access to
 passwords when away from the home computer, but what happens when
 the phone battery dies or the phone gets lost?</p>
 
 <p>Backup.Pass attempts to address this issue by providing a small,
 personal web server which can access the KeePass database. This is
-meant to be a secure, <em>emergency</em> backup server.</p>
+meant to be a secure, <em>emergency</em> backup server with <em>limited</em> access
+to your passwords.</p>
 
 <h2>
 <a name="security" class="anchor" href="#security"><span class="octicon octicon-link"></span></a>Security</h2>
 
-<p>backup.pass is not meant to be used on a regular basis.</p>
+<p>backupPass is not meant to be used on a regular basis. The features
+below are designed to minimize exposure if either your server is
+compromised or your backup keys fall into the wrong hands:</p>
 
 <ul>
 <li>Five one-time use encryption keys are generated on setup.</li>
@@ -71,34 +75,46 @@ supply the KeePass password to unlock the database.</li>
 </li>
 <li>Unencrypted Keepass database keys are not stored on the server.</li>
 <li>The Keepass password is never stored in any form.</li>
+<li>The server only allows access to one account per key.</li>
 </ul><h2>
 <a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h2>
 
 <ul>
-<li>Express</li>
-<li>KeePass.io</li>
+<li><a href="https://github.com/NeoXiD/keepass.io">KeePass.io</a></li>
+<li>ExpressJS</li>
 <li>body-parser</li>
 <li>node-tmp</li>
 <li>cookierParser</li>
 <li>express-session</li>
 <li>helmet</li>
 <li>csurf</li>
-</ul><p>Development dependencies:</p>
+</ul><p>The front end is built on jquery, with the source included in the
+distribution. Nothing is loaded over CDN's.</p>
+
+<p>Development dependencies:</p>
 
 <ul>
 <li>mocha</li>
 <li>should</li>
 <li>supertest</li>
 </ul><h2>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<div class="highlight highlight-bash"><pre><span class="nv">$&gt;</span> git clone https://github.com/mbsperry/backupPass.js.git
+<span class="nv">$&gt;</span> <span class="nb">cd </span>backupPass.js
+<span class="nv">$&gt;</span> mkdir do_not_include
+</pre></div>
+
+<h2>
 <a name="setup" class="anchor" href="#setup"><span class="octicon octicon-link"></span></a>Setup</h2>
 
 <ul>
-<li>Copy keepass database to <code>./keepass/keepass.kdbx</code>
+<li>Copy keepass database to <code>./keepass.kdbx</code>
 </li>
 <li>Copy keepass database key file to <code>./do_not_include/key.key</code>
 </li>
 <li>Build backup.pass keys:</li>
-</ul><div class="highlight highlight-bash"><pre>node setup.js production
+</ul><div class="highlight highlight-bash"><pre><span class="nv">$&gt;</span> node setup.js production
 </pre></div>
 
 <ul>
@@ -107,7 +123,7 @@ supply the KeePass password to unlock the database.</li>
 </ul><h2>
 <a name="run" class="anchor" href="#run"><span class="octicon octicon-link"></span></a>Run</h2>
 
-<div class="highlight highlight-bash"><pre>node app.js
+<div class="highlight highlight-bash"><pre><span class="nv">$&gt;</span> node app.js
 </pre></div>
 
 <ul>
@@ -169,7 +185,7 @@ supply the KeePass password to unlock the database.</li>
 
 <ul>
 <li>Tested extensively in Chrome</li>
-<li>use <code>/legacy</code> for a rather clunky version that works well in older browsers</li>
+<li>use <code>/legacy</code> route for a rather clunky version that works well in older browsers</li>
 </ul>
         </section>
 
