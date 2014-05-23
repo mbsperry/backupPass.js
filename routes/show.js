@@ -14,7 +14,7 @@ module.exports = function (req, res, next) {
 
   // Delete all session data
   req.session.accts = null
-  req.session = null
+  req.session.destroy()
 
   // Send the account information
   res.send(result)
