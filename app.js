@@ -32,6 +32,20 @@ app.enable('trust proxy')
 app.use(helmet.defaults())
 app.use(bodyParser.json()) // support for URL-encoded bodies in posts
 
+/* Check session keys for validity */
+app.use('/secure/', function(req, res, next) {
+  Sessions.validate(req.body.sessKey, function(err, sess) {
+    if (err) {
+      return next(err)
+    } else if (sess) {
+      req.session = sess
+      return next()
+    } else {
+      next(new Error('INVALID_SESSION'))
+    }
+  })
+})
+
 /* 
  *            Application Logic
  *
@@ -43,19 +57,6 @@ var version = require('./package.json').version
   , lockout = false
   , server
 
-/* Check session keys for validity */
-app.param('sessKey', function(req, res, next, key) {
-  Sessions.validate(key, function(err, sess) {
-    if (err) {
-      return next(err)
-    } else if (sess) {
-      req.session = sess
-      return next()
-    } else {
-      next(new Error('INVALID_SESSION'))
-    }
-  })
-})
 
 /*
  *
@@ -82,12 +83,6 @@ app.all('*', function(req, res, next) {
     res.status(404).send({ error: 'Not found' } )
   }
 })
-
-if (config.mode == 'test') {
-  app.get('/error', function(req, res, next) {
-    return next(new Error("Unhandled error"))
-  })
-}
 
 app.get('/', function (req, res) {
   res.sendfile('./public/index.html')
@@ -126,13 +121,13 @@ app.get('/jquery-1.11.0.min.js', function(req, res) {
 })
 
 // Show account information
-app.post('/session/secure/:sessKey/show', show)
+app.post('/secure/show', show)
 
 // Show account list
-app.post('/session/secure/:sessKey/list', list)
+app.post('/secure/list', list)
 
 // Check key, return true and 32byte sessionKey if good
-app.post('/session/auth', auth, function(req, res) {
+app.post('/auth', auth, function(req, res) {
   var sessKey = crypto.randomBytes(32).toString('hex')
   Sessions.createSession(sessKey, req.clearKey)
   res.send({ sessKey: sessKey, response: true })

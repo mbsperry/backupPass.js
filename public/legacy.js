@@ -10,23 +10,18 @@
  */
 
 $(document).ready(function() {
-  var csrfToken;
-  var bad_loginHTML = "Invalid Credentials";
+  var sessKey
+    , bad_loginHTML = "Invalid Credentials";
+
   $.get('/version', function(data) {
     $("#version").html(data);
   });
 
-  var get_csrf_token = function() {
-    $.get('/session', function(data) {
-      csrfToken = data.Token;
-    });
-  };
-  get_csrf_token();
 
   var send_ajax_post = function(url, data, success) {
+    data.sessKey = sessKey
     $.ajax({
       type: "POST",
-      headers: {'X-CSRF-TOKEN': csrfToken},
       url: url,
       contentType: 'application/json',
       data: JSON.stringify(data),
@@ -47,6 +42,7 @@ $(document).ready(function() {
   var key_submit = function() {
     var parameters = {key: $("#key").val()};
     var success = function(data, _, xhr) {
+      sessKey = data.sessKey
       if (data.response === true) {
         $("#verify").hide();
 
@@ -56,10 +52,9 @@ $(document).ready(function() {
 
         $("#pass").focus();
 
-        csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
       }
     };
-    send_ajax_post('session/auth', parameters, success);
+    send_ajax_post('/auth', parameters, success);
   };
 
   $('#key').keypress(function (e) {
@@ -98,10 +93,9 @@ $(document).ready(function() {
         $("#accounts").html(html);
         $("#verify").hide("fast");
         $("#acct_div").show("fast");
-        csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
       };
 
-      send_ajax_post('/session/secure/list', parameters, success);
+      send_ajax_post('/secure/list', parameters, success);
     });
   };
 
@@ -128,9 +122,8 @@ $(document).ready(function() {
       html += "<tr><td>Notes:</td><td class='td_body'>" + data.notes + "</td></tr>";
       $("#acct_div acct_headline").text(acct);
       $("#acct_div #acct_table").html(html).show();
-      csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
     };
-    send_ajax_post('/session/secure/show', parameters, success);
+    send_ajax_post('/secure/show', parameters, success);
   });
 });
 

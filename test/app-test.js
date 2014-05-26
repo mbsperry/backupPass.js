@@ -82,7 +82,7 @@ describe('authenticate with valid key', function() {
 
   it('should should return true and a sessKey', function(done) {
     successAgent
-    .post('/session/auth')
+    .post('/auth')
     .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
     .expect('Content-Type', /json/)
     .expect(200)
@@ -98,8 +98,8 @@ describe('authenticate with valid key', function() {
   describe('login with valid password', function() {
     it('Should return an array with a correct password', function(done) {
       successAgent
-      .post('/session/secure/' + sessKey + '/list')
-      .send({ pass: 'a test' })
+      .post('/secure/list')
+      .send({ pass: 'a test', sessKey: sessKey })
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function (err, res) {
@@ -111,8 +111,8 @@ describe('authenticate with valid key', function() {
 
     it('should return an account object when given an index', function(done) {
       successAgent
-      .post('/session/secure/' + sessKey + '/show')
-      .send({ index: 1})
+      .post('/secure/show')
+      .send({ index: 1, sessKey: sessKey})
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function (err, res) {
@@ -127,8 +127,8 @@ describe('authenticate with valid key', function() {
 
     it('should not allow repeated account access', function(done) {
       successAgent
-      .post('/session/secure/' + sessKey + '/show')
-      .send({ index: 2})
+      .post('/secure/show')
+      .send({ index: 2, sessKey: sessKey})
       .expect(403)
       .end(function(err, res) {
         res.body.error.should.equal("Invalid session")
@@ -142,14 +142,14 @@ describe('authenticate with invalid key', function() {
 
   it('should return 401 with invalid key', function(done) {
     failAgent
-    .post('/session/auth')
+    .post('/auth')
     .send({ key: 'incorrect key' })
     .expect(401, done);
   });
 
   it('should return false with a repeated key', function(done) {
     failAgent
-    .post('/session/auth')
+    .post('/auth')
     .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
     .expect(401, done);
   });
@@ -158,7 +158,7 @@ describe('authenticate with invalid key', function() {
   it('should delete all key files after three failed login attempts', function(done) {
     // One more bad login required first
     failAgent
-    .post('/session/auth')
+    .post('/auth')
     .send({ key: 'invalid key' })
     .end(function() {
       var path = basepath + '/../testing/';
@@ -187,12 +187,12 @@ describe('Sessions should be secure', function() {
 
   it.skip('should fail with an incorrect sessKey', function(done) {
     failAgent
-    .post('/session/auth')
+    .post('/auth')
     .send({ key: 'cde94152fe008cce8ce9d42b3964fc55c3eebbab2c9e3079af0f82735c4d0de0' })
     .end();
 
     failAgent
-    .post('/session/secure/WRONGKEY/list')
+    .post('/secure/list')
     .send({ pass: 'a test' })
     .expect(403, done);
   });
@@ -230,7 +230,7 @@ describe('Authenticate with incorrect password', function() {
     copyfile('key0.crypt');
     var authWithKey = function (err, token) {
       failAgent
-      .post('/session/auth')
+      .post('/auth')
       .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
       .end(function(err, res) {
         sessKey = res.body.sessKey
@@ -243,8 +243,8 @@ describe('Authenticate with incorrect password', function() {
 
   it('Should return an 401 with an incorrect password', function(done) {
     failAgent
-    .post('/session/secure/' + sessKey + '/list')
-    .send({ pass: 'incorrect password' })
+    .post('/secure/list')
+    .send({ pass: 'incorrect password' , sessKey: sessKey})
     .expect('Content-Type', /json/)
     .expect(401, done);
   });

@@ -15,6 +15,7 @@ $(document).ready(function() {
   });
 
   send_ajax_post = function(url, data, success) {
+    data.sessKey = sessKey
     $.ajax({
       type: "POST",
       url: url,
@@ -55,7 +56,7 @@ $(document).ready(function() {
 
       }
     };
-    send_ajax_post('session/auth', parameters, success);
+    send_ajax_post('auth', parameters, success);
   };
 
   $('#key').keypress(function (e) {
@@ -98,7 +99,7 @@ $(document).ready(function() {
         $("#acct_div").show("fast");
       };
 
-      send_ajax_post('/session/secure/' + sessKey + '/list', parameters, success);
+      send_ajax_post('/secure/list', parameters, success);
     });
   };
 
@@ -129,7 +130,7 @@ $(document).ready(function() {
       $("#acct_div #acct_table").html(html).show();
     };
 
-    send_ajax_post('/session/secure/' + sessKey + '/show', parameters, success);
+    send_ajax_post('/secure/show', parameters, success);
   });
 });
 
