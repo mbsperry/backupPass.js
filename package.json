@@ -28,6 +28,14 @@
     "supertest": "0.12.x",
     "should": "3.3.x"
   },
+  "keywords": [
+    "keepass",
+    "password",
+    "reader",
+    "manager",
+    "kdbx",
+    "webserver"
+  ],
   "engine": "node >= 0.10.21",
   "scripts": {
     "test": "mocha"
