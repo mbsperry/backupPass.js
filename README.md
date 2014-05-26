@@ -111,3 +111,8 @@ Stored as env variables. If running locally, can be stored in
 
 - Tested extensively in Chrome
 - use `/legacy` route for a rather clunky version that works well in older browsers
+
+## Contact
+
+Feedback is welcome. Issues and pull requests can be submitted via
+GitHub. Feel free to fork!
