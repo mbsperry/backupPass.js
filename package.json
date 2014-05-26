@@ -2,13 +2,20 @@
   "name": "BackupPass",
   "description": "A simple backup server for KeePass users",
   "version": "0.13.1",
-  "author": "Matthew Sperry",
+  "author": "Matthew Sperry <matt@msperry.net>",
   "license": "MIT",
   "main": "app.js",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbsperry/backupPass.js"
+  },
+  "bugs": {
+    "url": "https://github.com/mbsperry/backupPass.js/issues/"
+  },
   "dependencies": {
-    "express": "4.0.0",
-    "body-parser": "~1.0.2",
+    "express": "4.x.x",
+    "body-parser": "~1.0.x",
     "tmp": "~0.0.23",
     "keepass.io": "~0.2.8",
     "cookie-parser": "1.x.x",
