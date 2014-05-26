@@ -78,43 +78,32 @@ describe('index', function() {
 });
 
 describe('authenticate with valid key', function() {
-  var csrfToken;
+  var sessKey
 
-  before(function(done) {
-    var setToken = function(err, token) {
-      csrfToken = token;
-      done();
-    };
-    getToken(successAgent, setToken);
-  });
-
-  it('should should return true', function(done) {
+  it('should should return true and a sessKey', function(done) {
     successAgent
     .post('/session/auth')
-    .set('X-CSRF-TOKEN', csrfToken)
     .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
     .expect('Content-Type', /json/)
     .expect(200)
-    .expect({ response: true })
-    .end(function() {
-      // I don't know why I don't have to save cookies here
-      //successAgent.saveCookies();
+    .end(function(err, res) {
+      if (err) return done(err)
+      res.body.sessKey.should.be.ok
+      res.body.response.should.equal.true
+      sessKey = res.body.sessKey
       done();
     });
-  }); 
+  });
 
   describe('login with valid password', function() {
     it('Should return an array with a correct password', function(done) {
       successAgent
-      .post('/session/secure/list')
-      .set('X-CSRF-TOKEN', csrfToken)
+      .post('/session/secure/' + sessKey + '/list')
       .send({ pass: 'a test' })
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function (err, res) {
         if (err) return done(err);
-        successAgent.saveCookies(res);
-        csrfToken = res.header['x-csrf-token'];
         res.body.should.be.instanceof(Array);
         done();
       });
@@ -122,8 +111,7 @@ describe('authenticate with valid key', function() {
 
     it('should return an account object when given an index', function(done) {
       successAgent
-      .post('/session/secure/show')
-      .set('X-CSRF-TOKEN', csrfToken)
+      .post('/session/secure/' + sessKey + '/show')
       .send({ index: 1})
       .expect('Content-Type', /json/)
       .expect(200)
@@ -136,25 +124,25 @@ describe('authenticate with valid key', function() {
         done();
       });
     });
+
+    it('should not allow repeated account access', function(done) {
+      successAgent
+      .post('/session/secure/' + sessKey + '/show')
+      .send({ index: 2})
+      .expect(403)
+      .end(function(err, res) {
+        res.body.error.should.equal("Invalid session")
+        done()
+      });
+    });
   });
 });
 
 describe('authenticate with invalid key', function() {
-  var csrfToken;
-
-  before(function(done) {
-    var setToken = function(err, token) {
-      csrfToken = token;
-      done();
-    };
-    getToken(failAgent, setToken);
-  });
-
 
   it('should return 401 with invalid key', function(done) {
     failAgent
     .post('/session/auth')
-    .set('X-CSRF-TOKEN', csrfToken)
     .send({ key: 'incorrect key' })
     .expect(401, done);
   });
@@ -162,7 +150,6 @@ describe('authenticate with invalid key', function() {
   it('should return false with a repeated key', function(done) {
     failAgent
     .post('/session/auth')
-    .set('X-CSRF-TOKEN', csrfToken)
     .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
     .expect(401, done);
   });
@@ -172,7 +159,6 @@ describe('authenticate with invalid key', function() {
     // One more bad login required first
     failAgent
     .post('/session/auth')
-      .set('X-CSRF-TOKEN', csrfToken)
     .send({ key: 'invalid key' })
     .end(function() {
       var path = basepath + '/../testing/';
@@ -198,21 +184,16 @@ describe('authenticate with invalid key', function() {
 });
 
 describe('Sessions should be secure', function() {
-  var csrfToken;
 
-  before(function(done) {
-    var setToken = function(err, token) {
-      csrfToken = token;
-      done();
-    };
-    getToken(failAgent, setToken);
-  });
-
-  it('should fail with an incorrect csrf token', function(done) {
+  it.skip('should fail with an incorrect sessKey', function(done) {
     failAgent
     .post('/session/auth')
-    .set('X-CSRF-TOKEN', "Wrong token")
     .send({ key: 'cde94152fe008cce8ce9d42b3964fc55c3eebbab2c9e3079af0f82735c4d0de0' })
+    .end();
+
+    failAgent
+    .post('/session/secure/WRONGKEY/list')
+    .send({ pass: 'a test' })
     .expect(403, done);
   });
 
@@ -223,7 +204,7 @@ describe('Sessions should be secure', function() {
 
 
 describe('Authenticate with incorrect password', function() {
-  var csrfToken;
+  var sessKey
 
   before(function(done) {
     // Make sure to delete the lockfile if it exists
@@ -248,14 +229,11 @@ describe('Authenticate with incorrect password', function() {
     // Make sure to wait through timeout from last bad login
     copyfile('key0.crypt');
     var authWithKey = function (err, token) {
-      csrfToken = token;
       failAgent
       .post('/session/auth')
-      .set('X-CSRF-TOKEN', csrfToken)
       .send({ key: '245871dde31a9fb81f76745f279b6b161501b8e41c1ad05fa88f65481d19f2c4' })
       .end(function(err, res) {
-        csrfToken = res.header['x-csrf-token'];
-        failAgent.saveCookies(res);
+        sessKey = res.body.sessKey
         done();
       });
     };
@@ -265,8 +243,7 @@ describe('Authenticate with incorrect password', function() {
 
   it('Should return an 401 with an incorrect password', function(done) {
     failAgent
-    .post('/session/secure/list')
-    .set('X-CSRF-TOKEN', csrfToken)
+    .post('/session/secure/' + sessKey + '/list')
     .send({ pass: 'incorrect password' })
     .expect('Content-Type', /json/)
     .expect(401, done);

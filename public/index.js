@@ -4,9 +4,8 @@
 // Copyright Matthew Sperry 2014, distributed under the MIT license
 
 $(document).ready(function() {
-  var csrfToken
+  var sessKey
     , bad_loginHTML = "Invalid Credentials"
-    , get_csrf_token
     , send_ajax_post
     , key_submit
     , pass_submit
@@ -15,17 +14,9 @@ $(document).ready(function() {
     $("#version").html(data);
   });
 
-  get_csrf_token = function() {
-    $.get('/session', function(data) {
-      csrfToken = data.Token;
-    });
-  };
-  get_csrf_token();
-
   send_ajax_post = function(url, data, success) {
     $.ajax({
       type: "POST",
-      headers: {'X-CSRF-TOKEN': csrfToken},
       url: url,
       contentType: 'application/json',
       data: JSON.stringify(data),
@@ -48,6 +39,7 @@ $(document).ready(function() {
       , width
       , success = function(data, _, xhr) {
       if (data.response === true) {
+        sessKey = data.sessKey
         $("#verify").hide();
         width = $("#content").width();
 
@@ -61,7 +53,6 @@ $(document).ready(function() {
             $("#pass").focus();
         });
 
-        csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
       }
     };
     send_ajax_post('session/auth', parameters, success);
@@ -105,10 +96,9 @@ $(document).ready(function() {
         $("#accounts").html(html);
         $("#verify").hide("fast");
         $("#acct_div").show("fast");
-        csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
       };
 
-      send_ajax_post('/session/secure/list', parameters, success);
+      send_ajax_post('/session/secure/' + sessKey + '/list', parameters, success);
     });
   };
 
@@ -137,10 +127,9 @@ $(document).ready(function() {
       html += "<tr><td>Notes:</td><td class='td_body'>" + data.notes + "</td></tr>";
       $("#acct_div acct_headline").text(acct);
       $("#acct_div #acct_table").html(html).show();
-      csrfToken = xhr.getResponseHeader('X-CSRF-TOKEN');
     };
 
-    send_ajax_post('/session/secure/show', parameters, success);
+    send_ajax_post('/session/secure/' + sessKey + '/show', parameters, success);
   });
 });
 

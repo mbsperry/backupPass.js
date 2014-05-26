@@ -1,8 +1,9 @@
 var fs = require('fs')
   , crypto = require('crypto')
   , bodyParser = require('body-parser')
+
+// Secure HTTP headers
   , helmet = require('helmet')
-  , csrf = require('csurf')
 
 // Load logger
   , logger = require('./lib/log')
@@ -15,29 +16,13 @@ var fs = require('fs')
   , list = require('./routes/list.js')
   , show = require('./routes/show.js')
 
+// Load session logic
+  , Sessions = require('./lib/session')
+
 // Load express
   , express = require('express')
-  , cookieParser = require('cookie-parser')
-  , session = require('express-session')
 
   , app = express()
-  , use_secure_cookies
-
-/*            
- *            Define middleware
- */
-
-
-function checkLoginKey (req, res, next) {
-  if (req.session.login === true) {
-    next()
-  } else {
-    logger(2, "Invalid login session")
-    res.send("Error: invalid session")
-  }
-}
-
-
 
 /*
  *          Setup middleware
@@ -46,46 +31,6 @@ function checkLoginKey (req, res, next) {
 app.enable('trust proxy')
 app.use(helmet.defaults())
 app.use(bodyParser.json()) // support for URL-encoded bodies in posts
-app.use(cookieParser())
-
-// This is designed to be a single use web server. It should only be handling
-// a single session at any time, so I think it is acceptable to use MemoryStore in
-// this case, even though it does not scale.
-var memStore = new session.MemoryStore()
-
-// Use a randomly generated session key. Persistence is not important in
-// this application.
-try {
-  var sessKey = crypto.randomBytes(32).toString('hex')
-} catch (err) {
-  // Have to throw this since the error handler isn't up yet
-  throw err
-}
-
-
-if (config.mode == 'production') {
-  use_secure_cookies = true
-} else {
-  use_secure_cookies = false
-}
-
-app.use('/session', session({
-  secret: sessKey,
-  key: 'session.sid',
-  store: memStore,
-  proxy: true,
-  cookie: {
-    secure: use_secure_cookies,
-    httpOnly: true,
-    maxage: 300000
-  }
-}))
-app.use('/session/secure', checkLoginKey)
-app.use('/session', csrf())
-app.use('/session', function(req, res, next) {
-  res.set({'X-CSRF-TOKEN': req.csrfToken()})
-  next()
-})
 
 /* 
  *            Application Logic
@@ -98,6 +43,19 @@ var version = require('./package.json').version
   , lockout = false
   , server
 
+/* Check session keys for validity */
+app.param('sessKey', function(req, res, next, key) {
+  Sessions.validate(key, function(err, sess) {
+    if (err) {
+      return next(err)
+    } else if (sess) {
+      req.session = sess
+      return next()
+    } else {
+      next(new Error('INVALID_SESSION'))
+    }
+  })
+})
 
 /*
  *
@@ -168,17 +126,17 @@ app.get('/jquery-1.11.0.min.js', function(req, res) {
 })
 
 // Show account information
-app.post('/session/secure/show', show)
+app.post('/session/secure/:sessKey/show', show)
 
 // Show account list
-app.post('/session/secure/list', list)
+app.post('/session/secure/:sessKey/list', list)
 
-app.get('/session', function(req, res) {
-  res.send({'Token': req.csrfToken()})
+// Check key, return true and 32byte sessionKey if good
+app.post('/session/auth', auth, function(req, res) {
+  var sessKey = crypto.randomBytes(32).toString('hex')
+  Sessions.createSession(sessKey, req.clearKey)
+  res.send({ sessKey: sessKey, response: true })
 })
-
-// Check key
-app.post('/session/auth', auth)
 
 /*
  *      Error handling
@@ -197,6 +155,8 @@ function bad_login (next) {
     login_pause = false
   }, pauseLength)
 
+  // Lock server, delete all key files and database
+  // after 3 failed attempts
   if (login_attempts > 2) {
     lockout = true
     //server.close()
@@ -214,6 +174,8 @@ function bad_login (next) {
       deleteKDBX()
     }
 
+    fs.readdir(key_prefix, deleteKeyFiles)
+
     deleteKDBX = function() {
       logger(2, "Deleting KDBX: " + config.keepass_path)
       fs.unlink(config.keepass_path, function(err) {
@@ -221,7 +183,6 @@ function bad_login (next) {
       })
     }
 
-    fs.readdir(key_prefix, deleteKeyFiles)
     logger(2, 'Server locked')
   }
 }
@@ -229,13 +190,9 @@ function bad_login (next) {
 app.use(function (err, req, res, next) {
   logger(2, "Error handler received: " + err)
   if (err.message == 'BAD_LOGIN') {
-    // Not sure if I want to do this -- 
-    // maybe allow people another chance at entering password 
-    // before destroying the session?
-    req.session = null
     res.status(401).send({ error: 'Error: Invalid credentials' } )
     bad_login(next)
-  } else if (err.message == 'invalid csrf token') {
+  } else if (err.message == 'INVALID_SESSION') {
     res.status(403).send({ error: 'Invalid session'})
   } else {
     next(err)

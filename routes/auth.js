@@ -16,24 +16,26 @@ module.exports = function (req, res, next) {
 
   // Try to decrypt each of the 5 key files
   fs.readdir(key_prefix, function(err, files) {
+    var clear_key
+
     files.some(function(file) {
 
       // false if decyption fails
       var test_key = cryptHelp.decrypt_phrase(key, key_prefix + file)
       if (test_key) {
         cryptfile = key_prefix + file
-        req.session.clear_key = test_key
+        clear_key = test_key
         return true
       }
       else {
         // Must set this explicitly to avoid memory
-        req.session.clear_key = false
+        clear_key = false
         return false
       }
     })
 
     // Was the key properly decrypted?
-    if (req.session.clear_key) {
+    if (clear_key) {
       logdata += '\n***Decryption success***'
       logger(3, logreq, logdata)
 
@@ -41,8 +43,8 @@ module.exports = function (req, res, next) {
         if (err) return next(err)
       })
 
-      req.session.login = true
-      res.send({ response: true })
+    req.clearKey = clear_key
+    return next()
     }
     else {
       logdata += '\nDecryption failed'

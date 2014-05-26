@@ -58,7 +58,7 @@ module.exports = function (req, res, next) {
     res.json(acctNames)
   }
 
-  write_tmp_file(req.session.clear_key, function cb(err, path) {
+  write_tmp_file(req.session.clearKey, function cb(err, path) {
     if (err) return next(err)
     list_accts(req, kdbx_pass, path, render)
   })
