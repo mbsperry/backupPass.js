@@ -5,6 +5,7 @@
 var logger = require('../lib/log')
   , config = require('../lib/config')
   , cryptHelp = require('../lib/cryptoHelper')
+  , twilio = require('../lib/twilio')
   , fs = require('fs')
 
 module.exports = function (req, res, next) {
@@ -37,6 +38,9 @@ module.exports = function (req, res, next) {
     // Was the key properly decrypted?
     if (clear_key) {
       logdata += '\n***Decryption success***'
+      if (config.useTwilio) {
+        twilio("Decryption success: " + req.ip)
+      }
       logger(3, logreq, logdata)
 
       fs.unlink(cryptfile, function (err) {

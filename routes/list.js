@@ -7,6 +7,7 @@ var fs = require('fs')
   , write_tmp_file = require('../lib/write_tmp_file')
   , logger = require('../lib/log')
   , config = require('../lib/config')
+  , twilio = require('../lib/twilio')
 
 /*
  * Generates the list of KeePass accounts
@@ -31,6 +32,9 @@ function list_accts (req, key, keyfile, next) {
         acctNames.push(entry.title)
       })
       logger(3, '***KDBX unlock success***')
+      if (config.useTwilio) {
+        twilio("KDBX unlocked: " + req.ip)
+      }
     }
     fs.unlink(keyfile, function (err) {
       if (err) {
