@@ -1,7 +1,7 @@
 {
   "name": "BackupPass",
   "description": "A simple backup server for KeePass users",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "author": "Matthew Sperry <matt@msperry.net>",
   "license": "MIT",
   "main": "app.js",
