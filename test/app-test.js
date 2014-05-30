@@ -12,6 +12,7 @@ process.env.NODE_ENV = 'test';
 process.env.KEEPASS_PATH = './testing_db.kdbx';
 process.env.LOG_LEVEL = 'quiet';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+process.env.USE_TWILIO = false;
 
 
 var basepath = __dirname;
